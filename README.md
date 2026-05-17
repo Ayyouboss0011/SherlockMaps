@@ -45,7 +45,7 @@ The easiest way to get started. Docker handles all dependencies, Playwright, and
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/Ayyouboss0011/SherlockMaps.git
 cd GoogleMapsCrawler
 
 # Start the API server
@@ -83,7 +83,7 @@ docker compose down
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/Ayyouboss0011/SherlockMaps.git
 cd GoogleMapsCrawler
 
 # Build the image
@@ -111,7 +111,7 @@ Install Python dependencies manually and run the crawler directly.
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/Ayyouboss0011/SherlockMaps.git
 cd GoogleMapsCrawler
 
 # Install Python dependencies
