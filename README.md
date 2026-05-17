@@ -1,7 +1,5 @@
 <img src="public/SherlockMaps.png" alt="SherlockMaps Icon" width="200">
 
-# GoogleMapsCrawler
-
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Playwright](https://img.shields.io/badge/browser--automation-playwright-green.svg)](https://playwright.dev/)
 
 A professional, object-oriented open-source Google Maps web crawler that extracts company information from Google Maps. Built with [Playwright](https://playwright.dev/) for browser automation.
