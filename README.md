@@ -6,6 +6,11 @@
 
 A professional, object-oriented open-source Google Maps web crawler that extracts company information from Google Maps. Built with [Playwright](https://playwright.dev/) for browser automation.
 
+<div align="center">
+  <h2>Sherlock Maps</h2>
+  <p>Open-Source Google Maps Webcrawler</p>
+</div>
+
 ## Features
 
 - **Object-Oriented** - Cleanly structured with classes, dataclasses, and design patterns
@@ -38,8 +43,8 @@ Choose the path that fits your workflow:
 |---|---|---|
 | **[CLI Mode](#cli-mode)** | Direct command-line usage | `pip install -r requirements.txt` |
 | **[Python Library](#python-library)** | Programmatic usage in your scripts | `from core.crawler import run_crawler` |
-| **[REST API](#rest-api)** | Persistent API server for integrations | `docker run -p 8000:8000 google-maps-crawler` |
-| **[Docker](#docker)** | Containerized deployment | `docker build -t google-maps-crawler .` |
+| **[REST API](#rest-api)** | Persistent API server for integrations | `docker run -p 8000:8000 sherlock-maps` |
+| **[Docker](#docker)** | Containerized deployment | `docker build -t sherlock-maps .` |
 
 ---
 
@@ -112,8 +117,8 @@ python main.py
 | Format | Description |
 |---|---|
 | `json` | JSON array to stdout (default) |
-| `file` | Saves results as `results_YYYYMMDD_HHMMSS.json` |
-| `csv` | Saves results as `results_YYYYMMDD_HHMMSS.csv` |
+| `file` | Saves results as `sherlock-maps_YYYYMMDD_HHMMSS.json` |
+| `csv` | Saves results as `sherlock-maps_YYYYMMDD_HHMMSS.csv` |
 | `print` | Each company individually with separator |
 | `pretty` | Human-readable format with aligned fields |
 
@@ -198,13 +203,13 @@ The crawler can run as a persistent service with REST API. The container starts 
 ```bash
 # Build the image
 cd core
-docker build -t google-maps-crawler .
+docker build -t sherlock-maps .
 
 # Start API server (port 8000)
-docker run -p 8000:8000 google-maps-crawler
+docker run -p 8000:8000 sherlock-maps
 
 # With custom port
-docker run -p 8080:8080 -e API_PORT=8080 google-maps-crawler
+docker run -p 8080:8080 -e API_PORT=8080 sherlock-maps
 ```
 
 ### API Endpoints
@@ -327,6 +332,23 @@ http://localhost:8000/docs
 
 ## Docker
 
+### Build & Run
+
+```bash
+# Build the image
+cd core
+docker build -t sherlock-maps .
+
+# Run as API server
+docker run -p 8000:8000 sherlock-maps
+
+# Run in CLI mode
+docker run -e PROMPT="restaurants berlin" sherlock-maps python /app/core/main_cli.py
+
+# Headless mode
+docker run -e PROMPT="restaurants berlin" -e HEADLESS="true" sherlock-maps python /app/core/main_cli.py
+```
+
 ### How It Works
 
 1. **Search** - Navigates to Google Maps with the search term
@@ -339,26 +361,12 @@ http://localhost:8000/docs
 4. **Filter** - Removes duplicates and validates website URLs
 5. **Output** - Outputs results in the desired format
 
-### CLI Mode (legacy)
-
-```bash
-# Build the image
-cd core
-docker build -t google-maps-crawler .
-
-# CLI mode
-docker run -e PROMPT="restaurants berlin" google-maps-crawler python /app/core/main_cli.py
-
-# Headless mode
-docker run -e PROMPT="restaurants berlin" -e HEADLESS="true" google-maps-crawler python /app/core/main_cli.py
-```
-
 ---
 
 ## Architecture
 
 ```
-GoogleMapsCrawler/
+Sherlock Maps/
 ├── .gitignore
 ├── docker-compose.yml
 ├── README.md
@@ -401,6 +409,7 @@ GoogleMapsCrawler/
 
 | Class | Module | Description |
 |---|---|---|
+| `Sherlock Maps` | | Open-Source Google Maps Webcrawler |
 | `GoogleMapsCrawler` | `crawler.py` | Main class, orchestrates the entire crawling process |
 | `BrowserManager` | `browser/browser_manager.py` | Manages Playwright browser lifecycle |
 | `MapsExtractor` | `extractors/maps_extractor.py` | Extracts company data from Google Maps |
