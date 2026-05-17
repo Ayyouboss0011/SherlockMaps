@@ -1,6 +1,4 @@
-<div align="center">
-  <img src="public/SherlockMaps.png" alt="SherlockMaps Icon" width="120">
-</div>
+<img src="public/SherlockMaps.png" alt="SherlockMaps Icon" width="200">
 
 # GoogleMapsCrawler
 
