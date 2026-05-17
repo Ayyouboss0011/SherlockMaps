@@ -35,42 +35,134 @@ A professional, open-source Google Maps web crawler that extracts company inform
 
 ---
 
-## Get Started
+## Quick Start
 
-Choose the path that fits your workflow:
+### Option 1: Docker (Recommended)
 
-| | Description | Install |
-|---|---|---|
-| **[CLI Mode](#cli-mode)** | Direct command-line usage | `pip install -r requirements.txt` |
-| **[Python Library](#python-library)** | Programmatic usage in your scripts | `from core.crawler import run_crawler` |
-| **[REST API](#rest-api)** | Persistent API server for integrations | `docker run -p 8000:8000 sherlock-maps` |
-| **[Docker](#docker)** | Containerized deployment | `docker build -t sherlock-maps .` |
+The easiest way to get started. Docker handles all dependencies, Playwright, and browser setup automatically.
+
+#### Using docker-compose (Simplest)
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd GoogleMapsCrawler
+
+# Start the API server
+docker compose up -d
+
+# The API is now running at http://localhost:8000
+# Interactive documentation: http://localhost:8000/docs
+```
+
+#### Start a crawl via API
+
+```bash
+curl -X POST http://localhost:8000/crawl \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "restaurants berlin"}'
+```
+
+#### Get results
+
+```bash
+# Check job status
+curl http://localhost:8000/status
+
+# Get all results
+curl http://localhost:8000/results
+```
+
+#### Stop the container
+
+```bash
+docker compose down
+```
+
+#### Using Docker CLI (without docker-compose)
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd GoogleMapsCrawler
+
+# Build the image
+cd core && docker build -t sherlock-maps . && cd ..
+
+# Run as API server
+docker run -d -p 8000:8000 --name sherlock-maps sherlock-maps
+
+# Run in CLI mode (one-time crawl)
+docker run --rm -e PROMPT="restaurants berlin" sherlock-maps python /app/core/main_cli.py
+```
 
 ---
 
-## Installation
+### Option 2: Without Docker
 
-### 1. Clone the repository
+Install Python dependencies manually and run the crawler directly.
+
+#### Prerequisites
+
+- Python 3.9 or higher
+- Git
+
+#### Installation
 
 ```bash
+# Clone the repository
 git clone <your-repo-url>
 cd GoogleMapsCrawler
-```
 
-### 2. Install dependencies
-
-```bash
+# Install Python dependencies
 cd core
 pip install -r requirements.txt
+
+# Install Playwright browsers
 playwright install chromium
 ```
 
-### 3. Run the crawler
+#### Run the CLI crawler
 
 ```bash
-# CLI Mode
+# Set search term
 export PROMPT="restaurants berlin"
+
+# Run the crawler
 python main.py
+```
+
+#### Run the REST API server
+
+```bash
+# Start the API server on port 8000
+python api_main.py
+
+# The API is now running at http://localhost:8000
+# Interactive documentation: http://localhost:8000/docs
+```
+
+#### Start a crawl via API
+
+```bash
+curl -X POST http://localhost:8000/crawl \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "restaurants berlin"}'
+```
+
+#### Use as a Python library
+
+```python
+from core.crawler import run_crawler
+
+results = run_crawler(
+    prompt="restaurants berlin",
+    headless=False,
+    output_format="json"
+)
+
+for company in results:
+    print(f"{company.name} - {company.website}")
 ```
 
 ---
@@ -330,26 +422,7 @@ http://localhost:8000/docs
 
 ---
 
-## Docker
-
-### Build & Run
-
-```bash
-# Build the image
-cd core
-docker build -t sherlock-maps .
-
-# Run as API server
-docker run -p 8000:8000 sherlock-maps
-
-# Run in CLI mode
-docker run -e PROMPT="restaurants berlin" sherlock-maps python /app/core/main_cli.py
-
-# Headless mode
-docker run -e PROMPT="restaurants berlin" -e HEADLESS="true" sherlock-maps python /app/core/main_cli.py
-```
-
-### How It Works
+## How It Works
 
 1. **Search** - Navigates to Google Maps with the search term
 2. **Scroll** - Loads all search results by scrolling
