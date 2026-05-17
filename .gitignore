@@ -1,0 +1,33 @@
+# Chrome Profile (Playwright browser data)
+# Note: core/Chrome_Profile is tracked by Git LFS
+**/chrome_profile_*
+
+# Config files with credentials
+**/config.json
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+**/.venv/
+**/venv/
+
+# Core internal git (if any)
+core/.git
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.clinerules
+
+# OS
+.DS_Store
+Thumbs.db

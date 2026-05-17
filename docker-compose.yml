@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  crawler:
+    build:
+      context: ./core
+      dockerfile: Dockerfile
+    container_name: google-maps-crawler
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Persist Chrome profile between runs
+      - chrome_profile:/app/core/Chrome_Profile
+      # Persist results
+      - results:/app/core/results
+    restart: unless-stopped
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+
+volumes:
+  chrome_profile:
+    driver: local
+  results:
+    driver: local
