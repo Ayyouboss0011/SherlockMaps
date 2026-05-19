@@ -11,12 +11,15 @@ services:
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=8000
+      - DISPLAY=:99
       - PYTHONUNBUFFERED=1
     volumes:
       # Persist Chrome profile between runs
       - chrome_profile:/app/core/Chrome_Profile
       # Persist results
       - results:/app/core/results
+      # Persist Xvfb logs for debugging
+      - xvfb_logs:/var/log/xvfb
     restart: unless-stopped
     # Resource limits
     deploy:
@@ -30,4 +33,6 @@ volumes:
   chrome_profile:
     driver: local
   results:
+    driver: local
+  xvfb_logs:
     driver: local

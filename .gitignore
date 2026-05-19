@@ -31,3 +31,6 @@ core/.git
 # OS
 .DS_Store
 Thumbs.db
+
+# LeadGenUI
+LeadGenUI/

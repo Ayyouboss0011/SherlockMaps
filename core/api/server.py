@@ -242,6 +242,10 @@ def _create_app() -> FastAPI:
 
     # --- Crawl Endpoints ---
 
+    # IMPORTANT: Static routes MUST come before dynamic routes in FastAPI.
+    # /crawl/history must be defined BEFORE /crawl/{job_id} or FastAPI will
+    # interpret "history" as a job_id parameter value.
+
     @app.post("/crawl", response_model=CrawlResponse, status_code=202, tags="Crawler")
     async def start_crawl(request: CrawlRequest) -> CrawlResponse:
         """Start a new crawl job.
@@ -265,6 +269,34 @@ def _create_app() -> FastAPI:
             status=job.status,
             prompt=job.prompt,
             created_at=job.created_at,
+        )
+
+    @app.get("/crawl/history", response_model=HistoryResponse, tags="Crawler")
+    async def get_crawl_history(
+        limit: int = 50,
+        offset: int = 0,
+    ) -> HistoryResponse:
+        """Get the history of crawl jobs with pagination."""
+        jobs = await queue_manager.get_all_jobs(limit=limit, offset=offset)
+
+        entries = [
+            HistoryEntry(
+                job_id=j.job_id,
+                status=j.status,
+                prompt=j.prompt,
+                created_at=j.created_at,
+                completed_at=j.completed_at,
+                results_count=len(j.results) if j.results else 0,
+            )
+            for j in jobs
+        ]
+
+        all_jobs = await queue_manager.get_all_jobs(limit=10000, offset=0)
+        return HistoryResponse(
+            jobs=entries,
+            total=len(all_jobs),
+            limit=limit,
+            offset=offset,
         )
 
     @app.get("/crawl/{job_id}", response_model=JobResultResponse, tags="Crawler")
@@ -318,34 +350,6 @@ def _create_app() -> FastAPI:
             message=f"Job {job_id} has been cancelled",
             job_id=job.job_id,
             status=job.status,
-        )
-
-    @app.get("/crawl/history", response_model=HistoryResponse, tags="Crawler")
-    async def get_crawl_history(
-        limit: int = 50,
-        offset: int = 0,
-    ) -> HistoryResponse:
-        """Get the history of crawl jobs with pagination."""
-        jobs = await queue_manager.get_all_jobs(limit=limit, offset=offset)
-
-        entries = [
-            HistoryEntry(
-                job_id=j.job_id,
-                status=j.status,
-                prompt=j.prompt,
-                created_at=j.created_at,
-                completed_at=j.completed_at,
-                results_count=len(j.results) if j.results else 0,
-            )
-            for j in jobs
-        ]
-
-        all_jobs = await queue_manager.get_all_jobs(limit=10000, offset=0)
-        return HistoryResponse(
-            jobs=entries,
-            total=len(all_jobs),
-            limit=limit,
-            offset=offset,
         )
 
     # --- Results Endpoints ---
@@ -481,8 +485,10 @@ async def _process_job(job_id: str) -> None:
     This function runs the actual crawl operation in a separate process
     and updates the queue manager with the result.
     """
-    job = await queue_manager.get_job(job_id)
+    # Get the next job from queue - this transitions status from PENDING to RUNNING
+    job = await queue_manager.get_next_job()
     if not job:
+        logger.warning("Job %s not found in queue or already processed", job_id[:8])
         return
 
     logger.info("Processing job %s for prompt: %s", job_id[:8], job.prompt)
