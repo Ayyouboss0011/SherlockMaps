@@ -27,11 +27,11 @@ if _project_root not in sys.path:
 from core.crawler import run_crawler
 
 
-def parse_args() -> tuple[str, str, bool]:
+def parse_args() -> tuple[str, str, bool, bool]:
     """Parse command-line arguments and environment variables.
 
     Returns:
-        A tuple of (prompt, output_format, headless).
+        A tuple of (prompt, output_format, headless, track_reviews).
     """
     # Get search prompt from environment variable or command line
     prompt = os.getenv("PROMPT", "")
@@ -49,6 +49,7 @@ def parse_args() -> tuple[str, str, bool]:
             print("  PROMPT         Search term for Google Maps (required)")
             print("  OUTPUT_FORMAT  Output format: json, csv, pretty, file, print (default: json)")
             print("  HEADLESS       Run in headless mode: true, false (default: false)")
+            print("  TRACK_REVIEWS  Extract reviews for each company: true, false (default: true)")
             sys.exit(1)
 
     # Get output format from environment variable
@@ -61,7 +62,10 @@ def parse_args() -> tuple[str, str, bool]:
     # Get headless mode from environment variable
     headless = os.getenv("HEADLESS", "false").lower() in ("true", "1", "yes")
 
-    return prompt, output_format, headless
+    # Get track_reviews from environment variable
+    track_reviews = os.getenv("TRACK_REVIEWS", "true").lower() in ("true", "1", "yes")
+
+    return prompt, output_format, headless, track_reviews
 
 
 def setup_logging(level: int = logging.INFO) -> None:
@@ -82,7 +86,7 @@ def setup_logging(level: int = logging.INFO) -> None:
 def main() -> None:
     """Main CLI entry point."""
     # Parse arguments
-    prompt, output_format, headless = parse_args()
+    prompt, output_format, headless, track_reviews = parse_args()
 
     # Setup logging
     setup_logging()
@@ -92,6 +96,7 @@ def main() -> None:
     logger.info("Prompt: %s", prompt)
     logger.info("Output format: %s", output_format)
     logger.info("Headless mode: %s", headless)
+    logger.info("Track reviews: %s", track_reviews)
 
     # Run the crawler
     try:
@@ -99,6 +104,7 @@ def main() -> None:
             prompt=prompt,
             headless=headless,
             output_format=output_format,
+            track_reviews=track_reviews,
         )
         logger.info("Crawler completed successfully. Found %d companies.", len(results))
 

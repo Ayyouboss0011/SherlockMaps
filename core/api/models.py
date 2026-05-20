@@ -34,6 +34,7 @@ class CrawlRequest(BaseModel):
     headless: bool = Field(default=False, description="Run in headless mode")
     locale: str = Field(default="de-DE", description="Browser locale")
     max_results: Optional[int] = Field(default=None, ge=1, description="Maximum number of results")
+    track_reviews: bool = Field(default=True, description="Whether to track and extract reviews for each company")
 
 
 class CrawlResponse(BaseModel):
@@ -143,3 +144,45 @@ class CancelResponse(BaseModel):
     message: str
     job_id: str
     status: JobStatus
+
+
+# --- Review Models ---
+
+class ReviewResponse(BaseModel):
+    """Response model for a single review."""
+    author_name: str
+    author_image: str
+    author_local_guide: bool
+    author_review_count: int
+    rating: float
+    review_text: str
+    time_relative: str
+    review_id: str
+    likes: int
+    photos: List[str]
+    owner_response: str
+
+
+class CompanyReviewsResponse(BaseModel):
+    """Response model for reviews of a specific company."""
+    company_name: str
+    company_rating: str
+    company_category: str
+    reviews: List[ReviewResponse]
+
+
+class AllReviewsResponse(BaseModel):
+    """Response model for all reviews across companies."""
+    total_reviews: int
+    reviews: List[ReviewResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+class JobReviewsResponse(BaseModel):
+    """Response model for all reviews from a specific crawl job."""
+    job_id: str
+    prompt: str
+    total_reviews: int
+    companies: List[CompanyReviewsResponse]

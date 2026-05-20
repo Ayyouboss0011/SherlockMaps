@@ -48,6 +48,7 @@ class CrawlerConfig:
         max_scroll_attempts: Number of consecutive equal-height scrolls before stopping.
         max_retries: Number of navigation retry attempts.
         request_timeout: Request timeout in milliseconds.
+        track_reviews: Whether to extract reviews for each company.
     """
 
     search_prompt: str = ""
@@ -62,6 +63,7 @@ class CrawlerConfig:
     max_scroll_attempts: int = 5
     max_retries: int = 3
     request_timeout: int = 25000
+    track_reviews: bool = True
 
     def __post_init__(self) -> None:
         """Resolve relative paths to absolute paths after initialization."""

@@ -7,6 +7,57 @@ from typing import List
 
 
 @dataclass
+class ReviewData:
+    """Represents a single Google Maps review.
+
+    Attributes:
+        author_name: The name of the review author.
+        author_image: URL to the author's profile image.
+        author_local_guide: Whether the author is a Local Guide.
+        author_review_count: Total number of reviews by this author.
+        rating: The review rating (1.0 to 5.0).
+        review_text: The main text content of the review.
+        time_relative: Relative time string (e.g., "vor 6 Monaten").
+        review_id: Unique Google review ID.
+        likes: Number of "likes" on the review.
+        photos: List of photo URLs included in the review.
+        owner_response: The owner's response to the review (if any).
+    """
+
+    author_name: str = "N/A"
+    author_image: str = "N/A"
+    author_local_guide: bool = False
+    author_review_count: int = 0
+    rating: float = 0.0
+    review_text: str = "N/A"
+    time_relative: str = "N/A"
+    review_id: str = "N/A"
+    likes: int = 0
+    photos: List[str] = field(default_factory=list)
+    owner_response: str = "N/A"
+
+    def to_dict(self) -> dict:
+        """Convert the review data to a dictionary.
+
+        Returns:
+            A dictionary representation of the review.
+        """
+        return {
+            "author_name": self.author_name,
+            "author_image": self.author_image,
+            "author_local_guide": self.author_local_guide,
+            "author_review_count": self.author_review_count,
+            "rating": self.rating,
+            "review_text": self.review_text,
+            "time_relative": self.time_relative,
+            "review_id": self.review_id,
+            "likes": self.likes,
+            "photos": self.photos,
+            "owner_response": self.owner_response,
+        }
+
+
+@dataclass
 class CompanyData:
     """Represents a company extracted from Google Maps.
 
@@ -21,6 +72,7 @@ class CompanyData:
         plus_code: The Google Plus Code for location reference.
         opening_hours: The operating hours information.
         attributes: Additional attributes (e.g., wheelchair accessibility).
+        reviews: List of review objects for this company.
     """
 
     name: str = "N/A"
@@ -33,8 +85,9 @@ class CompanyData:
     plus_code: str = "N/A"
     opening_hours: str = "N/A"
     attributes: List[str] = field(default_factory=lambda: ["N/A"])
+    reviews: List[ReviewData] = field(default_factory=lambda: [])
 
-    def to_dict(self) -> dict[str, str | List[str]]:
+    def to_dict(self) -> dict[str, str | List[str] | List[dict]]:
         """Convert the company data to a dictionary.
 
         Returns:
@@ -51,6 +104,7 @@ class CompanyData:
             "plus_code": self.plus_code,
             "opening_hours": self.opening_hours,
             "attributes": self.attributes,
+            "reviews": [r.to_dict() for r in self.reviews],
         }
 
     def has_valid_website(self) -> bool:
@@ -67,3 +121,5 @@ class CompanyData:
         """Normalize attributes after dataclass initialization."""
         if self.attributes is None:
             object.__setattr__(self, "attributes", ["N/A"])
+        if self.reviews is None:
+            object.__setattr__(self, "reviews", [])

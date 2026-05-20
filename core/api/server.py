@@ -30,9 +30,11 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.api.models import (
+    AllReviewsResponse,
     BrowserInfoResponse,
     CancelResponse,
     ClearResponse,
+    CompanyReviewsResponse,
     ConfigResponse,
     CrawlRequest,
     CrawlResponse,
@@ -40,9 +42,11 @@ from core.api.models import (
     HealthResponse,
     HistoryEntry,
     HistoryResponse,
+    JobReviewsResponse,
     JobResultResponse,
     JobStatus,
     OutputFormat,
+    ReviewResponse,
     StatsResponse,
     StatusResponse,
 )
@@ -106,6 +110,7 @@ def run_crawl_in_process(
     output_format: str = "json",
     headless: bool = False,
     locale: str = "de-DE",
+    track_reviews: bool = True,
 ) -> list[dict[str, Any]]:
     """Run a crawl in a worker process.
 
@@ -117,6 +122,7 @@ def run_crawl_in_process(
         output_format: Output format.
         headless: Run in headless mode.
         locale: Browser locale.
+        track_reviews: Whether to extract reviews for each company.
 
     Returns:
         List of company dictionaries.
@@ -145,7 +151,7 @@ def run_crawl_in_process(
 
         # Extract data
         extractor = MapsExtractor(page, config.selector_timeout)
-        raw_results = extractor.extract_all()
+        raw_results = extractor.extract_all(track_reviews=track_reviews)
 
         if not raw_results:
             logger.warning("No companies found for prompt: %s", prompt)
@@ -259,6 +265,7 @@ def _create_app() -> FastAPI:
             headless=request.headless,
             locale=request.locale,
             max_results=request.max_results,
+            track_reviews=request.track_reviews,
         )
 
         # Start background processing
@@ -454,6 +461,145 @@ def _create_app() -> FastAPI:
             viewport_height=config_update.get("viewport_height", 1080),
         )
 
+    # --- Review Endpoints ---
+
+    @app.get("/reviews", response_model=AllReviewsResponse, tags="Reviews")
+    async def get_all_reviews(
+        limit: int = 50,
+        offset: int = 0,
+    ) -> AllReviewsResponse:
+        """Get all reviews from completed crawl jobs with pagination.
+
+        This endpoint returns reviews from all completed jobs, flattened into a single list.
+        """
+        all_results = await queue_manager.get_all_results()
+
+        if not all_results:
+            return AllReviewsResponse(
+                total_reviews=0,
+                reviews=[],
+                total=0,
+                limit=limit,
+                offset=offset,
+            )
+
+        # Extract all reviews from all companies
+        all_reviews = []
+        for company_data in all_results:
+            reviews = company_data.get("reviews", [])
+            if reviews and isinstance(reviews, list):
+                for review in reviews:
+                    all_reviews.append(ReviewResponse(**review))
+
+        # Apply pagination
+        total = len(all_reviews)
+        paginated = all_reviews[offset:offset + limit]
+
+        return AllReviewsResponse(
+            total_reviews=total,
+            reviews=list(paginated),
+            total=total,
+            limit=limit,
+            offset=offset,
+        )
+
+    @app.get("/reviews/job/{job_id}", response_model=JobReviewsResponse, tags="Reviews")
+    async def get_job_reviews(job_id: str) -> JobReviewsResponse:
+        """Get all reviews from a specific crawl job.
+
+        This endpoint returns all reviews grouped by company for a given job.
+        """
+        job = await queue_manager.get_job(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+
+        if job.status != JobStatus.COMPLETED:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Job is not completed. Current status: {job.status.value}",
+            )
+
+        if not job.results:
+            return JobReviewsResponse(
+                job_id=job.job_id,
+                prompt=job.prompt,
+                total_reviews=0,
+                companies=[],
+            )
+
+        companies_reviews = []
+        total_reviews = 0
+
+        for company_data in job.results:
+            reviews = company_data.get("reviews", [])
+            if reviews and isinstance(reviews, list) and len(reviews) > 0:
+                company_reviews = [ReviewResponse(**r) for r in reviews]
+                companies_reviews.append(
+                    CompanyReviewsResponse(
+                        company_name=company_data.get("name", "N/A"),
+                        company_rating=company_data.get("rating", "N/A"),
+                        company_category=company_data.get("category", "N/A"),
+                        reviews=company_reviews,
+                    )
+                )
+                total_reviews += len(company_reviews)
+
+        return JobReviewsResponse(
+            job_id=job.job_id,
+            prompt=job.prompt,
+            total_reviews=total_reviews,
+            companies=companies_reviews,
+        )
+
+    @app.get(
+        "/reviews/company/{job_id}/{company_index}",
+        response_model=CompanyReviewsResponse,
+        tags="Reviews",
+    )
+    async def get_company_reviews(
+        job_id: str,
+        company_index: int,
+    ) -> CompanyReviewsResponse:
+        """Get reviews for a specific company from a completed crawl job.
+
+        Args:
+            job_id: The ID of the crawl job.
+            company_index: The zero-based index of the company in the job results.
+        """
+        job = await queue_manager.get_job(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+
+        if job.status != JobStatus.COMPLETED:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Job is not completed. Current status: {job.status.value}",
+            )
+
+        if not job.results:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No results found for job {job_id}",
+            )
+
+        if company_index < 0 or company_index >= len(job.results):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Company index {company_index} out of range. Job has {len(job.results)} companies.",
+            )
+
+        company_data = job.results[company_index]
+        reviews = company_data.get("reviews", [])
+
+        company_reviews = [ReviewResponse(**r) for r in reviews] if reviews else []
+
+        return CompanyReviewsResponse(
+            company_name=company_data.get("name", "N/A"),
+            company_rating=company_data.get("rating", "N/A"),
+            company_category=company_data.get("category", "N/A"),
+            reviews=company_reviews,
+        )
+
     # --- Browser Endpoints ---
 
     @app.get("/browser/info", response_model=BrowserInfoResponse, tags="Browser")
@@ -491,7 +637,12 @@ async def _process_job(job_id: str) -> None:
         logger.warning("Job %s not found in queue or already processed", job_id[:8])
         return
 
-    logger.info("Processing job %s for prompt: %s", job_id[:8], job.prompt)
+    logger.info(
+        "Processing job %s for prompt: %s (track_reviews=%s)",
+        job_id[:8],
+        job.prompt,
+        job.track_reviews,
+    )
 
     try:
         # Run the crawl in a separate process to avoid asyncio/Sync API conflicts
@@ -503,6 +654,7 @@ async def _process_job(job_id: str) -> None:
             job.output_format,
             job.headless,
             job.locale,
+            job.track_reviews,
         )
 
         await queue_manager.complete_job(job_id, results)

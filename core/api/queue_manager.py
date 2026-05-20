@@ -17,13 +17,15 @@ class CrawlJob:
     """Represents a single crawl job."""
 
     def __init__(self, prompt: str, output_format: str = "json", headless: bool = False,
-                 locale: str = "de-DE", max_results: Optional[int] = None) -> None:
+                 locale: str = "de-DE", max_results: Optional[int] = None,
+                 track_reviews: bool = True) -> None:
         self.job_id: str = str(uuid.uuid4())
         self.prompt: str = prompt
         self.output_format: str = output_format
         self.headless: bool = headless
         self.locale: str = locale
         self.max_results: Optional[int] = max_results
+        self.track_reviews: bool = track_reviews
         self.status: JobStatus = JobStatus.PENDING
         self.created_at: datetime = datetime.now(timezone.utc)
         self.completed_at: Optional[datetime] = None
@@ -62,6 +64,7 @@ class CrawlJob:
             "headless": self.headless,
             "locale": self.locale,
             "max_results": self.max_results,
+            "track_reviews": self.track_reviews,
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
@@ -103,7 +106,8 @@ class QueueManager:
         return self._active_job
 
     async def add_job(self, prompt: str, output_format: str = "json", headless: bool = False,
-                      locale: str = "de-DE", max_results: Optional[int] = None) -> CrawlJob:
+                      locale: str = "de-DE", max_results: Optional[int] = None,
+                      track_reviews: bool = True) -> CrawlJob:
         """Add a new crawl job to the queue."""
         async with self._lock:
             job = CrawlJob(
@@ -112,10 +116,11 @@ class QueueManager:
                 headless=headless,
                 locale=locale,
                 max_results=max_results,
+                track_reviews=track_reviews,
             )
             self._jobs[job.job_id] = job
             self._queue.append(job.job_id)
-            logger.info("Added new crawl job: %s for prompt: %s", job.job_id[:8], prompt)
+            logger.info("Added new crawl job: %s for prompt: %s (track_reviews=%s)", job.job_id[:8], prompt, track_reviews)
             return job
 
     async def get_next_job(self) -> Optional[CrawlJob]:
