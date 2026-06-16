@@ -46,7 +46,7 @@ The easiest way to get started. Docker handles all dependencies, Playwright, and
 ```bash
 # Clone the repository
 git clone https://github.com/Ayyouboss0011/SherlockMaps.git
-cd GoogleMapsCrawler
+cd SherlockMaps
 
 # Start the API server
 docker compose up -d
