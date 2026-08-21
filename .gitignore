@@ -46,5 +46,4 @@ core/.git
 .DS_Store
 Thumbs.db
 
-# LeadGenUI
-LeadGenUI/
+# LeadGenUI (see LeadGenUI/.gitignore for its own exclusions)

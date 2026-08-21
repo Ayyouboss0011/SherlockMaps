@@ -1,0 +1,81 @@
+@import "tw-animate-css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.375rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 0.875rem;
+  }
+}
+
+@layer components {
+  .table-container {
+    @apply overflow-x-auto rounded-lg border border-border;
+  }
+
+  .data-table {
+    @apply w-full text-sm text-left;
+  }
+
+  .data-table thead {
+    @apply bg-muted/50 text-muted-foreground text-xs uppercase font-medium;
+  }
+
+  .data-table th {
+    @apply px-3 py-2.5 border-b border-border font-medium;
+  }
+
+  .data-table td {
+    @apply px-3 py-2.5 border-b border-border;
+  }
+
+  .data-table tbody tr {
+    @apply hover:bg-muted/30 transition-colors duration-150;
+  }
+
+  .spinner {
+    @apply inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
+  }
+
+  .stat-card {
+    @apply bg-card border-border rounded-lg p-4 flex flex-col;
+  }
+
+  .stat-label {
+    @apply text-xs text-muted-foreground mb-1;
+  }
+
+  .stat-value {
+    @apply text-lg font-medium text-foreground;
+  }
+}
