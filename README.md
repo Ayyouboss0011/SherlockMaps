@@ -30,6 +30,7 @@ A professional, open-source Google Maps web crawler that extracts company inform
 - **URL Validation** (filters out invalid websites)
 - **Multiple Output Formats**: JSON, CSV, Pretty-Print, File, Print
 - **REST API** - Asynchronous job queue server with full-featured endpoints
+- **Email Crawling** - Extract email addresses from company websites
 - **Docker Support** - Containerized deployment
 - **Chrome Profile Persistence** - Session data persists between runs
 
@@ -420,6 +421,95 @@ When the API server is running, interactive Swagger documentation is available:
 http://localhost:8000/docs
 ```
 
+#### Email Crawler
+
+The API supports crawling company websites for email addresses after a map crawl completes.
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/email-crawl` | Start an email crawl for a completed job |
+| GET | `/email-crawl/{job_id}` | Get email crawl job status |
+| GET | `/emails` | Get all emails with pagination |
+| DELETE | `/emails` | Clear all email results |
+
+**Auto-trigger Email Crawl:**
+
+Set `auto_email_crawl: true` in the crawl request to automatically start an email crawl after the map crawl completes:
+
+```bash
+curl -X POST http://localhost:8000/crawl \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "restaurants berlin",
+    "auto_email_crawl": true
+  }'
+```
+
+**Manual Email Crawl:**
+
+After a map crawl completes, you can manually start an email crawl:
+
+```bash
+# First, start a map crawl
+curl -X POST http://localhost:8000/crawl \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "restaurants berlin"}'
+
+# Response: {"job_id": "abc-123", ...}
+
+# Then start an email crawl for that job
+curl -X POST http://localhost:8000/email-crawl \
+  -H "Content-Type: application/json" \
+  -d '{"job_id": "abc-123"}'
+
+# Response: {"job_id": "email-456", "parent_job_id": "abc-123", ...}
+
+# Check email crawl status
+curl http://localhost:8000/email-crawl/email-456
+
+# Get all emails
+curl http://localhost:8000/emails
+
+# Get all emails with pagination
+curl "http://localhost:8000/emails?limit=10&offset=0"
+
+# Clear all emails
+curl -X DELETE http://localhost:8000/emails
+```
+
+**Email Response Example:**
+
+```json
+{
+  "job_id": "email-456",
+  "parent_job_id": "abc-123",
+  "status": "completed",
+  "total_emails": 15,
+  "emails": [
+    {
+      "email": "info@restaurant-example.de",
+      "source_url": "https://www.restaurant-example.de/kontakt",
+      "company_name": "Restaurant Example",
+      "job_id": "abc-123",
+      "domain": "restaurant-example.de",
+      "additional_urls_crawled": 3,
+      "found_at": "2026-01-15T10:35:00Z"
+    }
+  ],
+  "created_at": "2026-01-15T10:33:00Z",
+  "completed_at": "2026-01-15T10:35:30Z",
+  "error": null
+}
+```
+
+**How Email Crawling Works:**
+
+1. The email crawler visits each company website from the map crawl results
+2. It extracts email addresses from the HTML content using regex patterns
+3. It follows internal links (Kontakt, Impressum, About, etc.) to find more emails
+4. Emails are deduplicated (same email only stored once)
+5. Each email includes metadata about where it was found
+
 ---
 
 ## How It Works
@@ -464,11 +554,13 @@ Sherlock Maps/
     │   └── crawler_exceptions.py     # Custom exceptions
     ├── extractors/
     │   ├── __init__.py
-    │   └── maps_extractor.py         # Google Maps data extraction
+    │   ├── maps_extractor.py         # Google Maps data extraction
+    │   └── email_extractor.py        # Email extraction from websites
     ├── models/
     │   ├── __init__.py
     │   ├── company.py                # CompanyData model
-    │   └── crawler_config.py         # CrawlerConfig model
+    │   ├── crawler_config.py         # CrawlerConfig model
+    │   └── email_data.py             # EmailData model
     ├── output/
     │   ├── __init__.py
     │   └── output_handler.py         # Output formats
@@ -486,7 +578,9 @@ Sherlock Maps/
 | `GoogleMapsCrawler` | `crawler.py` | Main class, orchestrates the entire crawling process |
 | `BrowserManager` | `browser/browser_manager.py` | Manages Playwright browser lifecycle |
 | `MapsExtractor` | `extractors/maps_extractor.py` | Extracts company data from Google Maps |
+| `EmailExtractor` | `extractors/email_extractor.py` | Extracts emails from company websites |
 | `CompanyData` | `models/company.py` | Data model for a company |
+| `EmailData` | `models/email_data.py` | Data model for an email |
 | `CrawlerConfig` | `models/crawler_config.py` | Crawler configuration |
 | `URLValidator` | `processors/url_validator.py` | Validates HTTP(S) URLs |
 | `DeduplicationProcessor` | `processors/deduplication_processor.py` | Removes duplicates |

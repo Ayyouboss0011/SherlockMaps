@@ -73,6 +73,9 @@ class CompanyData:
         opening_hours: The operating hours information.
         attributes: Additional attributes (e.g., wheelchair accessibility).
         reviews: List of review objects for this company.
+        email_status: Status of the email crawling for this company.
+            Values: "not_started", "pending", "completed", "failed", "no_website"
+        emails: List of email addresses found for this company.
     """
 
     name: str = "N/A"
@@ -86,6 +89,8 @@ class CompanyData:
     opening_hours: str = "N/A"
     attributes: List[str] = field(default_factory=lambda: ["N/A"])
     reviews: List[ReviewData] = field(default_factory=lambda: [])
+    email_status: str = "not_started"
+    emails: List[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, str | List[str] | List[dict]]:
         """Convert the company data to a dictionary.
@@ -105,6 +110,8 @@ class CompanyData:
             "opening_hours": self.opening_hours,
             "attributes": self.attributes,
             "reviews": [r.to_dict() for r in self.reviews],
+            "email_status": self.email_status,
+            "emails": self.emails,
         }
 
     def has_valid_website(self) -> bool:
@@ -123,3 +130,5 @@ class CompanyData:
             object.__setattr__(self, "attributes", ["N/A"])
         if self.reviews is None:
             object.__setattr__(self, "reviews", [])
+        if self.emails is None:
+            object.__setattr__(self, "emails", [])

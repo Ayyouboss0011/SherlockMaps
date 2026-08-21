@@ -34,6 +34,9 @@ VOLUME ["/app/core/Chrome_Profile"]
 # Xvfb log directory (must be created before USER switch)
 RUN mkdir -p /var/log/xvfb && chown appuser /var/log/xvfb
 
+# SMTP data directory for persisted mailer settings/templates/history
+RUN mkdir -p /app/core/smtp_data && chown appuser /app/core/smtp_data
+
 USER appuser
 
 # Default environment variables (can be overridden with --env flag or docker-compose.yml)

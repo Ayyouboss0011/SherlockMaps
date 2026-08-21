@@ -18,6 +18,8 @@ services:
       - chrome_profile:/app/core/Chrome_Profile
       # Persist results
       - results:/app/core/results
+      # Persist SMTP settings, templates and send history
+      - smtp_data:/app/core/smtp_data
       # Persist Xvfb logs for debugging
       - xvfb_logs:/var/log/xvfb
     restart: unless-stopped
@@ -33,6 +35,8 @@ volumes:
   chrome_profile:
     driver: local
   results:
+    driver: local
+  smtp_data:
     driver: local
   xvfb_logs:
     driver: local

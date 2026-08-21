@@ -2,6 +2,20 @@
 # Note: core/Chrome_Profile is tracked by Git LFS
 **/chrome_profile_*
 
+# Chrome profile caches (regenerable, not needed for session persistence)
+core/Chrome_Profile/Default/Cache/
+core/Chrome_Profile/Default/Code Cache/
+core/Chrome_Profile/Default/GPUCache/
+core/Chrome_Profile/Default/DawnGraphiteCache/
+core/Chrome_Profile/Default/DawnWebGPUCache/
+core/Chrome_Profile/Default/Service Worker/
+core/Chrome_Profile/Default/Shared Dictionary/
+core/Chrome_Profile/Default/No_Vary_Search/
+core/Chrome_Profile/Default/discount_infos_db/
+core/Chrome_Profile/GraphiteDawnCache/
+core/Chrome_Profile/component_crx_cache/
+core/Chrome_Profile/extensions_crx_cache/
+
 # Config files with credentials
 **/config.json
 
