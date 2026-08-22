@@ -37,6 +37,9 @@ RUN mkdir -p /var/log/xvfb && chown appuser /var/log/xvfb
 # SMTP data directory for persisted mailer settings/templates/history
 RUN mkdir -p /app/core/smtp_data && chown appuser /app/core/smtp_data
 
+# Jobs data directory for persisted crawl jobs and results
+RUN mkdir -p /app/core/jobs_data && chown appuser /app/core/jobs_data
+
 USER appuser
 
 # Default environment variables (can be overridden with --env flag or docker-compose.yml)

@@ -20,6 +20,34 @@ interface EmailSenderProps {
   onSendStarted: () => void;
 }
 
+const PREFS_STORAGE_KEY = "leadgen.sendEmails.prefs";
+
+interface SendEmailsPrefs {
+  job: string;
+  template: string;
+  delay: number;
+  testMode: boolean;
+}
+
+function loadPrefs(): SendEmailsPrefs | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(PREFS_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SendEmailsPrefs;
+  } catch {
+    return null;
+  }
+}
+
+function savePrefs(prefs: SendEmailsPrefs) {
+  try {
+    window.localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(prefs));
+  } catch {
+    // Storage unavailable (e.g. private mode) - ignore
+  }
+}
+
 export default function EmailSender({ onSendStarted }: EmailSenderProps) {
   const [jobs, setJobs] = useState<HistoryEntry[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
@@ -32,6 +60,7 @@ export default function EmailSender({ onSendStarted }: EmailSenderProps) {
   const [recipientsLoading, setRecipientsLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -42,19 +71,47 @@ export default function EmailSender({ onSendStarted }: EmailSenderProps) {
         crawlerApi.getTemplates(),
         crawlerApi.getSmtpSettings(),
       ]);
-      setJobs(history.jobs.filter((job) => job.status === "completed"));
+      const completedJobs = history.jobs.filter((job) => job.status === "completed");
+      setJobs(completedJobs);
       setTemplates(templateList);
       setSmtp(smtpSettings);
+
+      // Restore the form configuration from localStorage, keeping only
+      // selections that still exist on the server.
+      const prefs = loadPrefs();
+      const jobExists = prefs && completedJobs.some((job) => job.job_id === prefs.job);
+      const templateExists = prefs && templateList.some((t) => t.id === prefs.template);
+      const restoredJob = jobExists ? prefs!.job : "";
+      const restoredTemplate = templateExists ? prefs!.template : "";
+      setSelectedJob(restoredJob);
+      setSelectedTemplate(restoredTemplate);
+      setDelaySeconds(typeof prefs?.delay === "number" ? prefs.delay : 2);
+      setTestMode(Boolean(prefs?.testMode));
+      if (restoredJob) {
+        loadRecipients(restoredJob);
+      }
     } catch (err: any) {
       setError(err.message || "Could not load jobs or templates.");
     } finally {
       setLoading(false);
+      setHydrated(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    savePrefs({
+      job: selectedJob,
+      template: selectedTemplate,
+      delay: delaySeconds,
+      testMode,
+    });
+  }, [hydrated, selectedJob, selectedTemplate, delaySeconds, testMode]);
 
   const loadRecipients = async (jobId: string) => {
     if (!jobId) {

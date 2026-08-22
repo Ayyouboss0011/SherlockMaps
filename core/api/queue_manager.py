@@ -3,14 +3,26 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import os
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from core.api.models import JobStatus
 
 logger = logging.getLogger(__name__)
+
+
+def default_data_dir() -> str:
+    """Return the directory where persisted crawl jobs are stored."""
+    configured = os.environ.get("JOBS_DATA_DIR", "").strip()
+    if configured:
+        return configured
+    core_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(core_dir, "jobs_data")
 
 
 class CrawlJob:
@@ -116,10 +128,59 @@ class EmailCrawlJob:
         }
 
 
-class QueueManager:
-    """Manages crawl job queue and execution."""
+def _serialize_crawl_job(job: CrawlJob) -> dict[str, Any]:
+    return {
+        "job_id": job.job_id,
+        "prompt": job.prompt,
+        "output_format": job.output_format,
+        "headless": job.headless,
+        "locale": job.locale,
+        "max_results": job.max_results,
+        "track_reviews": job.track_reviews,
+        "auto_email_crawl": job.auto_email_crawl,
+        "status": job.status.value,
+        "created_at": job.created_at.isoformat(),
+        "completed_at": job.completed_at.isoformat() if job.completed_at else None,
+        "results": job.results,
+        "error": job.error,
+    }
 
-    def __init__(self) -> None:
+
+def _serialize_email_job(job: EmailCrawlJob) -> dict[str, Any]:
+    return {
+        "job_id": job.job_id,
+        "parent_job_id": job.parent_job_id,
+        "headless": job.headless,
+        "chrome_profile_path": job.chrome_profile_path,
+        "status": job.status.value,
+        "created_at": job.created_at.isoformat(),
+        "completed_at": job.completed_at.isoformat() if job.completed_at else None,
+        "results": job.results,
+        "error": job.error,
+    }
+
+
+def _parse_datetime(value: Any) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value)
+    except (TypeError, ValueError):
+        return None
+
+
+class QueueManager:
+    """Manages crawl job queue and execution.
+
+    Crawl and email jobs are persisted to disk (JSON) so they survive
+    server restarts and container rebuilds. Jobs that were still pending
+    or running when the server stopped are restored as cancelled.
+    """
+
+    def __init__(self, data_dir: Optional[str] = None) -> None:
+        self.data_dir = Path(data_dir or default_data_dir())
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self._jobs_file = self.data_dir / "jobs.json"
         self._crawl_jobs: Dict[str, CrawlJob] = {}
         self._email_jobs: Dict[str, EmailCrawlJob] = {}
         self._crawl_queue: list[str] = []
@@ -131,6 +192,121 @@ class QueueManager:
         self._total_failed: int = 0
         self._total_companies: int = 0
         self._total_emails: int = 0
+
+        self._load_jobs()
+
+    # ------------------------------------------------------------------ I/O
+
+    def _save_jobs(self) -> None:
+        """Persist all jobs to disk (atomic write). Failures are logged only."""
+        try:
+            payload = {
+                "crawl_jobs": [_serialize_crawl_job(j) for j in self._crawl_jobs.values()],
+                "email_jobs": [_serialize_email_job(j) for j in self._email_jobs.values()],
+            }
+            tmp = self._jobs_file.with_suffix(".tmp")
+            tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+            tmp.replace(self._jobs_file)
+        except Exception as e:
+            logger.error("Failed to persist jobs: %s", e)
+
+    def _recount_stats(self) -> None:
+        self._total_completed = sum(
+            1 for j in self._crawl_jobs.values() if j.status == JobStatus.COMPLETED
+        )
+        self._total_failed = sum(
+            1 for j in self._crawl_jobs.values() if j.status == JobStatus.FAILED
+        ) + sum(1 for j in self._email_jobs.values() if j.status == JobStatus.FAILED)
+        self._total_companies = sum(
+            len(j.results) for j in self._crawl_jobs.values()
+            if j.status == JobStatus.COMPLETED and j.results
+        )
+        self._total_emails = sum(
+            len(j.results) for j in self._email_jobs.values()
+            if j.status == JobStatus.COMPLETED and j.results
+        )
+
+    def _restore_crawl_job(self, raw: dict[str, Any]) -> CrawlJob:
+        job = CrawlJob(
+            prompt=raw.get("prompt", ""),
+            output_format=raw.get("output_format", "json"),
+            headless=raw.get("headless", False),
+            locale=raw.get("locale", "de-DE"),
+            max_results=raw.get("max_results"),
+            track_reviews=raw.get("track_reviews", True),
+            auto_email_crawl=raw.get("auto_email_crawl", False),
+        )
+        job.job_id = raw.get("job_id") or job.job_id
+        try:
+            job.status = JobStatus(raw.get("status", JobStatus.CANCELLED.value))
+        except ValueError:
+            job.status = JobStatus.CANCELLED
+        job.created_at = _parse_datetime(raw.get("created_at")) or job.created_at
+        job.completed_at = _parse_datetime(raw.get("completed_at"))
+        job.results = raw.get("results")
+        job.error = raw.get("error")
+        return job
+
+    def _restore_email_job(self, raw: dict[str, Any]) -> EmailCrawlJob:
+        job = EmailCrawlJob(
+            parent_job_id=raw.get("parent_job_id", ""),
+            websites=[],
+            headless=raw.get("headless", True),
+            chrome_profile_path=raw.get("chrome_profile_path", ""),
+        )
+        job.job_id = raw.get("job_id") or job.job_id
+        try:
+            job.status = JobStatus(raw.get("status", JobStatus.CANCELLED.value))
+        except ValueError:
+            job.status = JobStatus.CANCELLED
+        job.created_at = _parse_datetime(raw.get("created_at")) or job.created_at
+        job.completed_at = _parse_datetime(raw.get("completed_at"))
+        job.results = raw.get("results")
+        job.error = raw.get("error")
+        return job
+
+    def _load_jobs(self) -> None:
+        """Restore persisted jobs. Orphaned in-flight jobs become cancelled."""
+        if not self._jobs_file.exists():
+            return
+        try:
+            raw = json.loads(self._jobs_file.read_text(encoding="utf-8"))
+        except Exception as e:
+            logger.error("Failed to load persisted jobs: %s", e)
+            return
+
+        now = datetime.now(timezone.utc)
+        changed = False
+        for entry in raw.get("crawl_jobs", []):
+            if not isinstance(entry, dict):
+                continue
+            job = self._restore_crawl_job(entry)
+            if job.status in (JobStatus.PENDING, JobStatus.RUNNING):
+                job.status = JobStatus.CANCELLED
+                job.completed_at = now
+                job.error = "Server restarted while job was in flight"
+                changed = True
+            self._crawl_jobs[job.job_id] = job
+        for entry in raw.get("email_jobs", []):
+            if not isinstance(entry, dict):
+                continue
+            job = self._restore_email_job(entry)
+            if job.status in (JobStatus.PENDING, JobStatus.RUNNING):
+                job.status = JobStatus.CANCELLED
+                job.completed_at = now
+                job.error = "Server restarted while job was in flight"
+                changed = True
+            self._email_jobs[job.job_id] = job
+
+        self._recount_stats()
+        if changed:
+            self._save_jobs()
+        if self._crawl_jobs or self._email_jobs:
+            logger.info(
+                "Restored %d crawl jobs and %d email jobs from disk",
+                len(self._crawl_jobs),
+                len(self._email_jobs),
+            )
 
     @property
     def crawl_queue_length(self) -> int:
@@ -188,6 +364,7 @@ class QueueManager:
             )
             self._crawl_jobs[job.job_id] = job
             self._crawl_queue.append(job.job_id)
+            self._save_jobs()
             logger.info("Added new crawl job: %s for prompt: %s (auto_email_crawl=%s)",
                         job.job_id[:8], prompt, auto_email_crawl)
             return job
@@ -204,7 +381,8 @@ class QueueManager:
             )
             self._email_jobs[job.job_id] = job
             self._email_queue.append(job.job_id)
-            logger.info("Added new email crawl job: %s for parent job: %s (websites: %d)",
+            self._save_jobs()
+            logger.info("Added new email job: %s for parent job: %s (websites: %d)",
                         job.job_id[:8], parent_job_id[:8], len(websites))
             return job
 
@@ -243,15 +421,17 @@ class QueueManager:
                 self._active_crawl_job = None
                 self._total_completed += 1
                 self._total_companies += len(results)
+                self._save_jobs()
                 logger.info("Completed crawl job: %s with %d results", job_id[:8], len(results))
 
     async def start_email_crawl_for_parent(self, parent_job_id: str) -> None:
         """Set email_status to 'pending' for all companies in the parent job."""
         async with self._lock:
-            parent_job = self._crawl_jobs.get(parent_job_id)
-            if parent_job and parent_job.results:
-                for company in parent_job.results:
-                    company["email_status"] = "pending"
+                parent_job = self._crawl_jobs.get(parent_job_id)
+                if parent_job and parent_job.results:
+                    for company in parent_job.results:
+                        company["email_status"] = "pending"
+                    self._save_jobs()
 
     async def set_failed_email_status_for_parent(self, parent_job_id: str) -> None:
         """Set email_status to 'failed' for all companies in the parent job."""
@@ -260,6 +440,7 @@ class QueueManager:
             if parent_job and parent_job.results:
                 for company in parent_job.results:
                     company["email_status"] = "failed"
+                self._save_jobs()
 
     async def complete_email_job(self, job_id: str, results: list[dict[str, Any]]) -> None:
         """Mark an email crawl job as completed.
@@ -335,6 +516,8 @@ class QueueManager:
                             company["emails"] = []
                             company["email"] = ""
 
+                    self._save_jobs()
+
     async def fail_job(self, job_id: str, error: str) -> None:
         """Mark a crawl job as failed."""
         async with self._lock:
@@ -343,6 +526,7 @@ class QueueManager:
                 job.fail(error)
                 self._active_crawl_job = None
                 self._total_failed += 1
+                self._save_jobs()
                 logger.info("Failed crawl job: %s - %s", job_id[:8], error)
 
     async def fail_email_job(self, job_id: str, error: str) -> None:
@@ -353,6 +537,7 @@ class QueueManager:
                 job.fail(error)
                 self._active_email_job = None
                 self._total_failed += 1
+                self._save_jobs()
                 logger.info("Failed email crawl job: %s - %s", job_id[:8], error)
 
     async def cancel_job(self, job_id: str) -> Optional[CrawlJob]:
@@ -365,6 +550,7 @@ class QueueManager:
                 elif job.status == JobStatus.PENDING and job_id in self._crawl_queue:
                     self._crawl_queue.remove(job_id)
                 job.cancel()
+                self._save_jobs()
                 logger.info("Cancelled crawl job: %s", job_id[:8])
                 return job
             return None
@@ -433,6 +619,7 @@ class QueueManager:
                 if job.status == JobStatus.COMPLETED:
                     job.results = None
                     count += 1
+            self._save_jobs()
             logger.info("Cleared results from %d completed jobs", count)
             return count
 
@@ -444,7 +631,8 @@ class QueueManager:
                 if job.status == JobStatus.COMPLETED:
                     job.results = None
                     count += 1
-            logger.info("Cleared results from %d completed email jobs", count)
+            self._save_jobs()
+            logger.info("Cleared email results from %d completed email jobs", count)
             return count
 
     async def get_all_results(self) -> list[dict[str, Any]]:

@@ -20,6 +20,8 @@ services:
       - results:/app/core/results
       # Persist SMTP settings, templates and send history
       - smtp_data:/app/core/smtp_data
+      # Persist crawl jobs and their results
+      - jobs_data:/app/core/jobs_data
       # Persist Xvfb logs for debugging
       - xvfb_logs:/var/log/xvfb
     restart: unless-stopped
@@ -37,6 +39,8 @@ volumes:
   results:
     driver: local
   smtp_data:
+    driver: local
+  jobs_data:
     driver: local
   xvfb_logs:
     driver: local

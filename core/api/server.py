@@ -87,6 +87,25 @@ queue_manager = QueueManager()
 email_sender_store = EmailSenderStore()
 app_instance: Optional[FastAPI] = None
 
+# The event loop only keeps weak references to tasks, so fire-and-forget tasks
+# created with ``asyncio.create_task`` can be garbage-collected mid-execution.
+# Keep strong references to all background tasks until they finish.
+_background_tasks: set[asyncio.Task] = set()
+
+
+def spawn_background_task(coro) -> asyncio.Task:
+    """Create a background task that survives garbage collection."""
+    task = asyncio.create_task(coro)
+    _background_tasks.add(task)
+
+    def _done(t: asyncio.Task) -> None:
+        _background_tasks.discard(t)
+        if not t.cancelled() and t.exception() is not None:
+            logger.error("Background task failed: %s", t.exception())
+
+    task.add_done_callback(_done)
+    return task
+
 
 def init_browser(config_dict: dict) -> dict:
     """Initialize the browser in a worker process.
@@ -334,7 +353,7 @@ def _create_app() -> FastAPI:
         )
 
         # Start background processing
-        asyncio.create_task(_process_job(job.job_id))
+        spawn_background_task(_process_job(job.job_id))
 
         return CrawlResponse(
             job_id=job.job_id,
@@ -512,7 +531,7 @@ def _create_app() -> FastAPI:
         )
 
         # Start background email processing
-        asyncio.create_task(_process_email_job(email_job.job_id))
+        spawn_background_task(_process_email_job(email_job.job_id))
 
         return EmailCrawlResponse(
             job_id=email_job.job_id,
@@ -697,7 +716,7 @@ def _create_app() -> FastAPI:
             test=request.test,
         )
 
-        asyncio.create_task(
+        spawn_background_task(
             email_sender_store.process_send(
                 history_id=history_id,
                 template=template,
@@ -1083,7 +1102,7 @@ async def _process_job(job_id: str) -> None:
                     headless=True,
                     chrome_profile_path="",
                 )
-                asyncio.create_task(_process_email_job(email_job.job_id))
+                spawn_background_task(_process_email_job(email_job.job_id))
             else:
                 logger.warning("No valid websites found for email crawl in job %s", job_id[:8])
 
