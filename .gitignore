@@ -42,6 +42,9 @@ core/.git
 *.swo
 .clinerules
 
+# Local environment overrides (.env.example is the committed template)
+.env
+
 # OS
 .DS_Store
 Thumbs.db

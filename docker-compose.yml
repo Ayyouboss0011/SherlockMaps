@@ -37,8 +37,11 @@ services:
     build:
       context: ./LeadGenUI
       args:
-        # Browser-side API URL (inlined at build time, must be reachable from the host)
-        NEXT_PUBLIC_CRAWLER_API_URL: "http://localhost:${API_PORT:-6970}"
+        # Browser-side API URL (inlined at build time, must be reachable from the browser)
+        # Local: http://localhost:${API_PORT:-6970}
+        # Reverse proxy, same domain: /api
+        # Separate domain: https://api.example.com
+        NEXT_PUBLIC_CRAWLER_API_URL: "${NEXT_PUBLIC_CRAWLER_API_URL:-http://localhost:${API_PORT:-6970}}"
     container_name: google-maps-crawler-ui
     ports:
       - "${UI_PORT:-3008}:3000"
