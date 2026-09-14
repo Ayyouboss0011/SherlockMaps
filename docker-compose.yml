@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: google-maps-crawler
     ports:
-      - "${API_PORT:-8000}:8000"
+      - "${API_PORT:-6970}:8000"
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=8000
