@@ -33,6 +33,29 @@ services:
         reservations:
           memory: 512M
 
+  leadgenui:
+    build:
+      context: ./LeadGenUI
+      args:
+        # Browser-side API URL (inlined at build time, must be reachable from the host)
+        NEXT_PUBLIC_CRAWLER_API_URL: "http://localhost:${API_PORT:-6970}"
+    container_name: google-maps-crawler-ui
+    ports:
+      - "${UI_PORT:-3008}:3000"
+    environment:
+      # Server-side (SSR) API URL, reachable inside the Docker network
+      - CRAWLER_API_URL=http://crawler:8000
+    depends_on:
+      - crawler
+    restart: unless-stopped
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+
 volumes:
   chrome_profile:
     driver: local
