@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, type ChangeEvent } from "react";
 import { crawlerApi } from "@/lib/api";
 import { EmailBlacklistEntry } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -29,6 +29,8 @@ export default function BlacklistManager({ blacklist, onBlacklistChange }: Black
   const [removingEmail, setRemovingEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refresh = async () => {
     try {
@@ -88,6 +90,33 @@ export default function BlacklistManager({ blacklist, onBlacklistChange }: Black
       setError(err.message || "Could not clear blacklist.");
     } finally {
       setClearing(false);
+    }
+  };
+
+  const handleFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const name = file.name.toLowerCase();
+    if (!name.endsWith(".xlsx") && !name.endsWith(".csv")) {
+      setError("Please choose an .xlsx or .csv file.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    setImporting(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const result = await crawlerApi.importBlacklistFile(file);
+      const parts: string[] = [`Found ${result.emails_found} email(s) in ${result.filename}:`];
+      if (result.total_added > 0) parts.push(`${result.total_added} added`);
+      if (result.skipped.length > 0) parts.push(`${result.skipped.length} already blacklisted`);
+      setMessage({ type: "success", text: parts.join(", ") + "." });
+      await refresh();
+    } catch (err: any) {
+      setError(err.message || "Could not import the file.");
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -183,6 +212,48 @@ export default function BlacklistManager({ blacklist, onBlacklistChange }: Black
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                   Add to Blacklist
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* File import */}
+        <div className="rounded-lg border border-dashed border-border/60 bg-muted/20 p-3 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="text-xs text-muted-foreground">
+                Or import from an <span className="font-medium text-foreground">Excel (.xlsx) or CSV file</span> -
+                email addresses are detected automatically, no specific column layout needed.
+              </p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.csv"
+              onChange={handleFileSelected}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+              className="h-8 text-xs gap-1.5"
+            >
+              {importing ? (
+                <>
+                  <span className="inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4" />
+                  </svg>
+                  Upload File
                 </>
               )}
             </Button>

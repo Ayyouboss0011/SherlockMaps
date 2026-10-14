@@ -374,6 +374,17 @@ class EmailBlacklistCheckResponse(BaseModel):
     clean: List[str]
 
 
+class EmailBlacklistImportResponse(BaseModel):
+    """Result of importing a spreadsheet file into the blacklist."""
+    filename: str
+    sheets_scanned: int = 0
+    cells_scanned: int = 0
+    emails_found: int
+    added: List[str]
+    skipped: List[str] = Field(default_factory=list, description="Addresses already on the blacklist")
+    total_added: int
+
+
 class EmailSendHistoryEntry(BaseModel):
     """Single entry in the email send history."""
     id: str

@@ -4,3 +4,5 @@ requests
 fastapi
 uvicorn[standard]
 pydantic
+openpyxl
+python-multipart

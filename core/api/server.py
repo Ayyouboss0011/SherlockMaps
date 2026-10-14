@@ -27,7 +27,7 @@ _project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.api.models import (
@@ -45,6 +45,7 @@ from core.api.models import (
     EmailBlacklistAddRequest,
     EmailBlacklistAddResponse,
     EmailBlacklistCheckResponse,
+    EmailBlacklistImportResponse,
     EmailBlacklistResponse,
     EmailSendCancelResponse,
     EmailSendHistoryResponse,
@@ -72,6 +73,7 @@ from core.api.models import (
     StatusResponse,
 )
 from core.api.email_sender import EmailSenderStore, normalize_email
+from core.api.excel_import import extract_emails_from_file
 from core.api.queue_manager import QueueManager
 from core.browser import BrowserManager
 from core.extractors import MapsExtractor
@@ -848,6 +850,58 @@ def _create_app() -> FastAPI:
         return ClearResponse(
             message=f"Cleared {count} blacklist entries",
             cleared_count=count,
+        )
+
+    @app.post("/email-blacklist/import-file", response_model=EmailBlacklistImportResponse, status_code=201, tags="Email Sender")
+    async def import_blacklist_file(file: UploadFile = File(...)) -> EmailBlacklistImportResponse:
+        """Import email addresses from an uploaded Excel (.xlsx) or CSV file.
+
+        Every cell of the file is scanned and all email addresses are
+        detected automatically - no specific column layout required.
+        Found addresses are added to the blacklist (duplicates ignored).
+        """
+        filename = file.filename or "upload"
+        if not filename.lower().endswith((".xlsx", ".csv")):
+            raise HTTPException(
+                status_code=400,
+                detail="Unsupported file type: please upload an .xlsx or .csv file",
+            )
+        data = await file.read()
+        if not data:
+            raise HTTPException(status_code=400, detail="The uploaded file is empty")
+        if len(data) > 10 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File is too large (max 10 MB)")
+
+        try:
+            emails, info = extract_emails_from_file(data, filename)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.error("Blacklist file import failed: %s", e)
+            raise HTTPException(
+                status_code=422,
+                detail=f"Could not read the file: {e}",
+            )
+
+        if not emails:
+            raise HTTPException(
+                status_code=422,
+                detail="No email addresses found in the file",
+            )
+
+        added, skipped = email_sender_store.add_to_blacklist(emails)
+        logger.info(
+            "Imported blacklist file %s: %d found, %d added, %d skipped",
+            filename, len(emails), len(added), len(skipped),
+        )
+        return EmailBlacklistImportResponse(
+            filename=filename,
+            sheets_scanned=info.get("sheets_scanned", 0),
+            cells_scanned=info.get("cells_scanned", 0),
+            emails_found=len(emails),
+            added=added,
+            skipped=skipped,
+            total_added=len(added),
         )
 
     # --- Results Endpoints ---

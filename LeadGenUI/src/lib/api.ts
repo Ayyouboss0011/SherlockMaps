@@ -22,6 +22,7 @@ import {
   EmailBlacklistEntry,
   EmailBlacklistAddResponse,
   EmailBlacklistCheckResponse,
+  EmailBlacklistImportResponse,
 } from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8000";
@@ -266,5 +267,30 @@ export const crawlerApi = {
     return apiFetch("/email-blacklist", {
       method: "DELETE",
     });
+  },
+
+  async importBlacklistFile(file: File): Promise<EmailBlacklistImportResponse> {
+    const baseUrl = getApiUrl();
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${baseUrl}/email-blacklist/import-file`, {
+      method: "POST",
+      body: formData,
+      // NOTE: no manual Content-Type header - fetch sets the multipart boundary
+    });
+    if (!response.ok) {
+      let detail = `API Error (${response.status})`;
+      try {
+        const body = await response.json();
+        if (typeof body.detail === "string") detail = body.detail;
+        else if (Array.isArray(body.detail) && body.detail.length > 0) {
+          detail = body.detail.map((d: any) => d.msg || JSON.stringify(d)).join("; ");
+        }
+      } catch {
+        // non-JSON error body
+      }
+      throw new Error(detail);
+    }
+    return response.json() as Promise<EmailBlacklistImportResponse>;
   },
 };

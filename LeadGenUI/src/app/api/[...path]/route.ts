@@ -26,11 +26,21 @@ async function proxy(req: NextRequest, { params }: { params: { path: string[] } 
     body = await req.arrayBuffer();
   }
 
+  // Forward the original headers (incl. the multipart Content-Type + boundary
+  // for file uploads); only default to JSON when the client sent none.
+  const headers = new Headers();
+  req.headers.forEach((value: string, key: string) => {
+    if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
+      headers.set(key, value);
+    }
+  });
+  if (body !== undefined && !headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
+
   const upstream = await fetch(url, {
     method: req.method,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body,
   });
 

@@ -244,6 +244,16 @@ export interface EmailBlacklistCheckResponse {
   clean: string[];
 }
 
+export interface EmailBlacklistImportResponse {
+  filename: string;
+  sheets_scanned: number;
+  cells_scanned: number;
+  emails_found: number;
+  added: string[];
+  skipped: string[];
+  total_added: number;
+}
+
 export interface EmailSendHistoryEntry {
   id: string;
   history_id: string;
