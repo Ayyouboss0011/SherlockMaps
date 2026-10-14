@@ -3,7 +3,7 @@
 import { useState, useRef, type ChangeEvent } from "react";
 import { crawlerApi } from "@/lib/api";
 import { EmailBlacklistEntry } from "@/lib/types";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import CollapsibleCard from "@/components/Shared/CollapsibleCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -126,32 +126,30 @@ export default function BlacklistManager({ blacklist, onBlacklistChange }: Black
   };
 
   return (
-    <Card className="border-border/40">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <CardTitle className="text-sm font-medium">
-              Email Blacklist
-              <Badge variant="secondary" className="ml-2 text-xs h-4">{blacklist.length}</Badge>
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Do-not-contact list: blacklisted emails are never emailed. Add contacts here who told you they don't want to hear from you.
-            </CardDescription>
-          </div>
-          {blacklist.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClear}
-              disabled={clearing}
-              className="h-7 text-xs gap-1 text-red-600 hover:text-red-700 border-red-500/30 hover:bg-red-50 dark:hover:bg-red-950/20"
-            >
-              {clearing ? "Clearing..." : "Clear All"}
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CollapsibleCard
+      title={
+        <>
+          Email Blacklist
+          <Badge variant="secondary" className="ml-2 text-xs h-4">{blacklist.length}</Badge>
+        </>
+      }
+      description="Do-not-contact list: blacklisted emails are never emailed. Add contacts here who told you they don't want to hear from you."
+      actions={
+        blacklist.length > 0 ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClear}
+            disabled={clearing}
+            className="h-7 text-xs gap-1 text-red-600 hover:text-red-700 border-red-500/30 hover:bg-red-50 dark:hover:bg-red-950/20"
+          >
+            {clearing ? "Clearing..." : "Clear All"}
+          </Button>
+        ) : undefined
+      }
+      storageKey="leadgen.card.blacklist"
+      contentClassName="space-y-4"
+    >
         {error && (
           <div className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-600">
             {error}
@@ -306,7 +304,6 @@ export default function BlacklistManager({ blacklist, onBlacklistChange }: Black
             </table>
           </div>
         )}
-      </CardContent>
-    </Card>
+    </CollapsibleCard>
   );
 }

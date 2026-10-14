@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { crawlerApi } from "@/lib/api";
 import { EmailSendHistoryEntry } from "@/lib/types";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import CollapsibleCard from "@/components/Shared/CollapsibleCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -121,63 +121,58 @@ export default function SendHistory({ refreshTrigger }: SendHistoryProps) {
   };
 
   return (
-    <Card className="border-border/40">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <CardTitle className="text-sm font-medium">Send History</CardTitle>
-            <CardDescription className="text-xs">
-              Status of every email sent to crawled contacts.
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            {polling && (
-              <Badge variant="secondary" className="text-xs h-5 bg-blue-500/10 text-blue-600 border-blue-500/20">
-                <span className="inline-block w-1 h-1 rounded-full bg-blue-500 mr-1 animate-ping" />
-                Sending...
-              </Badge>
-            )}
-            {pendingHistoryIds.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleStop}
-                disabled={stopping}
-                className="h-7 text-xs gap-1 text-red-600 hover:text-red-700 border-red-500/30 hover:bg-red-50 dark:hover:bg-red-950/20"
-              >
-                {stopping ? (
-                  <>
-                    <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Stopping...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                    </svg>
-                    Stop Sending
-                  </>
-                )}
-              </Button>
-            )}
-            <Button variant="outline" size="sm" onClick={load} className="h-7 text-xs gap-1">
-              Refresh
+    <CollapsibleCard
+      title="Send History"
+      description="Status of every email sent to crawled contacts."
+      storageKey="leadgen.card.sendHistory"
+      actions={
+        <>
+          {polling && (
+            <Badge variant="secondary" className="text-xs h-5 bg-blue-500/10 text-blue-600 border-blue-500/20">
+              <span className="inline-block w-1 h-1 rounded-full bg-blue-500 mr-1 animate-ping" />
+              Sending...
+            </Badge>
+          )}
+          {pendingHistoryIds.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleStop}
+              disabled={stopping}
+              className="h-7 text-xs gap-1 text-red-600 hover:text-red-700 border-red-500/30 hover:bg-red-50 dark:hover:bg-red-950/20"
+            >
+              {stopping ? (
+                <>
+                  <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Stopping...
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                  </svg>
+                  Stop Sending
+                </>
+              )}
             </Button>
-            {total > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClear}
-                disabled={clearing}
-                className="h-7 text-xs gap-1 text-red-600 hover:text-red-700 border-red-500/30 hover:bg-red-50 dark:hover:bg-red-950/20"
-              >
-                {clearing ? "Clearing..." : "Clear History"}
-              </Button>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
+          )}
+          <Button variant="outline" size="sm" onClick={load} className="h-7 text-xs gap-1">
+            Refresh
+          </Button>
+          {total > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClear}
+              disabled={clearing}
+              className="h-7 text-xs gap-1 text-red-600 hover:text-red-700 border-red-500/30 hover:bg-red-50 dark:hover:bg-red-950/20"
+            >
+              {clearing ? "Clearing..." : "Clear History"}
+            </Button>
+          )}
+        </>
+      }
+    >
         {error && (
           <div className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-600 mb-3">
             {error}
@@ -229,7 +224,6 @@ export default function SendHistory({ refreshTrigger }: SendHistoryProps) {
             </div>
           </>
         )}
-      </CardContent>
-    </Card>
+    </CollapsibleCard>
   );
 }

@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { crawlerApi } from "@/lib/api";
 import { HistoryEntry, EmailTemplate, SmtpSettings, EmailBlacklistEntry } from "@/lib/types";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import CollapsibleCard from "@/components/Shared/CollapsibleCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -202,14 +203,12 @@ export default function EmailSender({ onSendStarted, blacklist }: EmailSenderPro
   }
 
   return (
-    <Card className="border-border/40">
-      <CardHeader>
-        <CardTitle className="text-sm font-medium">Send Emails</CardTitle>
-        <CardDescription className="text-xs">
-          Send an email template to all crawled contacts of a completed job.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CollapsibleCard
+      title="Send Emails"
+      description="Send an email template to all crawled contacts of a completed job."
+      storageKey="leadgen.card.sendEmails"
+      contentClassName="space-y-4"
+    >
         {error && (
           <div className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-600">
             {error}
@@ -424,7 +423,6 @@ export default function EmailSender({ onSendStarted, blacklist }: EmailSenderPro
             )}
           </Button>
         </div>
-      </CardContent>
-    </Card>
+    </CollapsibleCard>
   );
 }
