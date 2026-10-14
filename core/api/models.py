@@ -336,7 +336,42 @@ class EmailSendResponse(BaseModel):
     job_id: str
     template_id: str
     total_recipients: int
+    skipped_blacklisted: int = 0
     started_at: datetime
+
+
+# --- Email Blacklist Models ---
+
+class EmailBlacklistEntry(BaseModel):
+    """A single entry in the email blacklist (do-not-contact list)."""
+    email: str
+    added_at: datetime
+    note: str = ""
+
+
+class EmailBlacklistAddRequest(BaseModel):
+    """Request to add one or more email addresses to the blacklist."""
+    emails: List[str] = Field(..., min_length=1, description="Email addresses to block")
+    note: str = Field(default="", description="Optional reason/note (e.g. 'unsubscribed', 'requested no contact')")
+
+
+class EmailBlacklistAddResponse(BaseModel):
+    """Result of adding email addresses to the blacklist."""
+    added: List[str]
+    skipped: List[str] = Field(default_factory=list, description="Addresses that were already blacklisted or invalid")
+    total: int
+
+
+class EmailBlacklistResponse(BaseModel):
+    """Response with the current blacklist contents."""
+    entries: List[EmailBlacklistEntry]
+    total: int
+
+
+class EmailBlacklistCheckResponse(BaseModel):
+    """Result of checking which of the given emails are blacklisted."""
+    blacklisted: List[str]
+    clean: List[str]
 
 
 class EmailSendHistoryEntry(BaseModel):

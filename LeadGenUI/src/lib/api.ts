@@ -19,6 +19,9 @@ import {
   EmailSendResponse,
   EmailSendHistoryResponse,
   EmailSendCancelResponse,
+  EmailBlacklistEntry,
+  EmailBlacklistAddResponse,
+  EmailBlacklistCheckResponse,
 } from "./types";
 
 const DEFAULT_API_URL = "http://localhost:8000";
@@ -230,6 +233,37 @@ export const crawlerApi = {
 
   async clearSendHistory(): Promise<{ message: string; cleared_count: number }> {
     return apiFetch("/emails/send/history", {
+      method: "DELETE",
+    });
+  },
+
+  // Email blacklist
+  async getBlacklist(): Promise<{ entries: EmailBlacklistEntry[]; total: number }> {
+    return apiFetch<{ entries: EmailBlacklistEntry[]; total: number }>("/email-blacklist");
+  },
+
+  async addToBlacklist(emails: string[], note: string = ""): Promise<EmailBlacklistAddResponse> {
+    return apiFetch<EmailBlacklistAddResponse>("/email-blacklist", {
+      method: "POST",
+      body: JSON.stringify({ emails, note }),
+    });
+  },
+
+  async checkBlacklist(emails: string[]): Promise<EmailBlacklistCheckResponse> {
+    return apiFetch<EmailBlacklistCheckResponse>("/email-blacklist/check", {
+      method: "POST",
+      body: JSON.stringify({ emails }),
+    });
+  },
+
+  async removeFromBlacklist(email: string): Promise<{ message: string; cleared_count: number }> {
+    return apiFetch(`/email-blacklist/${encodeURIComponent(email)}`, {
+      method: "DELETE",
+    });
+  },
+
+  async clearBlacklist(): Promise<{ message: string; cleared_count: number }> {
+    return apiFetch("/email-blacklist", {
       method: "DELETE",
     });
   },

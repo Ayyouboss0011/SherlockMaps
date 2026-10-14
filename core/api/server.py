@@ -42,6 +42,10 @@ from core.api.models import (
     EmailCrawlRequest,
     EmailCrawlResponse,
     EmailDataResponse,
+    EmailBlacklistAddRequest,
+    EmailBlacklistAddResponse,
+    EmailBlacklistCheckResponse,
+    EmailBlacklistResponse,
     EmailSendCancelResponse,
     EmailSendHistoryResponse,
     EmailSendRequest,
@@ -67,7 +71,7 @@ from core.api.models import (
     StatsResponse,
     StatusResponse,
 )
-from core.api.email_sender import EmailSenderStore
+from core.api.email_sender import EmailSenderStore, normalize_email
 from core.api.queue_manager import QueueManager
 from core.browser import BrowserManager
 from core.extractors import MapsExtractor
@@ -679,6 +683,9 @@ def _create_app() -> FastAPI:
         Emails are sent in the background using the selected template.
         Use ``test=true`` for a test run where every personalized email is
         sent to the configured test recipient email instead of the real one.
+
+        Recipients that are on the email blacklist (do-not-contact list) are
+        never emailed; they are recorded in the send history as ``skipped``.
         """
         job = await queue_manager.get_crawl_job(request.job_id)
         if not job:
@@ -709,6 +716,16 @@ def _create_app() -> FastAPI:
                 detail=f"No email addresses found in job {request.job_id}",
             )
 
+        to_send, blocked = email_sender_store.filter_blacklisted(recipients)
+        if not to_send:
+            raise HTTPException(
+                status_code=400,
+                detail=f"All {len(blocked)} recipients of job {request.job_id} are on the "
+                       "email blacklist. Nothing to send.",
+            )
+
+        blocked_emails = {normalize_email(r.get("email", "")) for r in blocked}
+
         history_id = email_sender_store.create_send(
             job_id=request.job_id,
             template=template,
@@ -723,6 +740,7 @@ def _create_app() -> FastAPI:
                 recipients=recipients,
                 delay_seconds=request.delay_seconds,
                 test=request.test,
+                blocked_emails=blocked_emails,
             )
         )
 
@@ -730,7 +748,8 @@ def _create_app() -> FastAPI:
             history_id=history_id,
             job_id=request.job_id,
             template_id=template.id,
-            total_recipients=len(recipients),
+            total_recipients=len(to_send),
+            skipped_blacklisted=len(blocked),
             started_at=datetime.now(timezone.utc),
         )
 
@@ -773,6 +792,61 @@ def _create_app() -> FastAPI:
         count = email_sender_store.clear_history()
         return ClearResponse(
             message=f"Cleared {count} send history entries",
+            cleared_count=count,
+        )
+
+    # --- Email Blacklist Endpoints ---
+
+    @app.get("/email-blacklist", response_model=EmailBlacklistResponse, tags="Email Sender")
+    async def get_email_blacklist() -> EmailBlacklistResponse:
+        """List all entries of the email blacklist (do-not-contact list)."""
+        entries = email_sender_store.get_blacklist()
+        return EmailBlacklistResponse(entries=entries, total=len(entries))
+
+    @app.post("/email-blacklist", response_model=EmailBlacklistAddResponse, status_code=201, tags="Email Sender")
+    async def add_to_email_blacklist(request: EmailBlacklistAddRequest) -> EmailBlacklistAddResponse:
+        """Add one or more email addresses to the blacklist.
+
+        Addresses are normalized (lowercase, trimmed) and duplicates are
+        ignored. A ``note`` can record the reason (e.g. 'unsubscribed').
+        """
+        added, skipped = email_sender_store.add_to_blacklist(
+            request.emails, note=request.note
+        )
+        return EmailBlacklistAddResponse(added=added, skipped=skipped, total=len(added))
+
+    @app.post("/email-blacklist/check", response_model=EmailBlacklistCheckResponse, tags="Email Sender")
+    async def check_email_blacklist(request: EmailBlacklistAddRequest) -> EmailBlacklistCheckResponse:
+        """Check which of the given email addresses are currently blacklisted."""
+        blacklisted: list[str] = []
+        clean: list[str] = []
+        for raw_email in request.emails:
+            normalized = normalize_email(raw_email)
+            if not normalized:
+                clean.append(raw_email.strip())
+                continue
+            if email_sender_store.is_blacklisted(normalized):
+                blacklisted.append(normalized)
+            else:
+                clean.append(normalized)
+        return EmailBlacklistCheckResponse(blacklisted=blacklisted, clean=clean)
+
+    @app.delete("/email-blacklist/{email}", response_model=ClearResponse, tags="Email Sender")
+    async def remove_from_email_blacklist(email: str) -> ClearResponse:
+        """Remove a single email address from the blacklist."""
+        if not email_sender_store.remove_from_blacklist(email):
+            raise HTTPException(status_code=404, detail=f"Email {email} not in blacklist")
+        return ClearResponse(
+            message=f"Removed {normalize_email(email)} from blacklist",
+            cleared_count=1,
+        )
+
+    @app.delete("/email-blacklist", response_model=ClearResponse, tags="Email Sender")
+    async def clear_email_blacklist() -> ClearResponse:
+        """Remove all entries from the email blacklist."""
+        count = email_sender_store.clear_blacklist()
+        return ClearResponse(
+            message=f"Cleared {count} blacklist entries",
             cleared_count=count,
         )
 

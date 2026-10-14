@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Any, Iterator, Optional
 
 from core.api.models import (
+    EmailBlacklistEntry,
     EmailSendHistoryEntry,
     EmailTemplate,
     EmailTemplateCreate,
@@ -78,6 +79,7 @@ class EmailSenderStore:
         self._smtp: SmtpSettings = SmtpSettings()
         self._templates: dict[str, EmailTemplate] = {}
         self._history: list[EmailSendHistoryEntry] = []
+        self._blacklist: list[EmailBlacklistEntry] = []
         self._active_sends: set[str] = set()
         self._cancel_events: dict[str, asyncio.Event] = {}
         self._executor: Optional[concurrent.futures.ThreadPoolExecutor] = None
@@ -120,6 +122,16 @@ class EmailSenderStore:
             except Exception as e:
                 logger.error("Failed to load send history: %s", e)
 
+        blacklist_file = self.data_dir / "blacklist.json"
+        if blacklist_file.exists():
+            try:
+                raw = json.loads(blacklist_file.read_text(encoding="utf-8"))
+                self._blacklist = [
+                    EmailBlacklistEntry.model_validate(entry) for entry in raw
+                ]
+            except Exception as e:
+                logger.error("Failed to load email blacklist: %s", e)
+
     def _save(self) -> None:
         settings_file = self.data_dir / "mailer.json"
         payload = {
@@ -138,6 +150,15 @@ class EmailSenderStore:
             encoding="utf-8",
         )
         tmp.replace(history_file)
+
+        blacklist_file = self.data_dir / "blacklist.json"
+        blacklist_payload = [e.model_dump(mode="json") for e in self._blacklist]
+        tmp = blacklist_file.with_suffix(".tmp")
+        tmp.write_text(
+            json.dumps(blacklist_payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        tmp.replace(blacklist_file)
 
     # ----------------------------------------------------------------- SMTP
 
@@ -261,6 +282,94 @@ class EmailSenderStore:
         logger.info("Deleted email template: %s", template_id)
         return existed
 
+    # -------------------------------------------------------------- Blacklist
+
+    def get_blacklist(self) -> list[EmailBlacklistEntry]:
+        """Return the current blacklist entries, newest first."""
+        with self._lock:
+            entries = sorted(
+                self._blacklist,
+                key=lambda e: e.added_at,
+                reverse=True,
+            )
+            return list(entries)
+
+    def is_blacklisted(self, email: str) -> bool:
+        """Check whether an email address is on the blacklist."""
+        normalized = normalize_email(email)
+        with self._lock:
+            return any(e.email == normalized for e in self._blacklist)
+
+    def add_to_blacklist(
+        self, emails: list[str], note: str = ""
+    ) -> tuple[list[str], list[str]]:
+        """Add email addresses to the blacklist (idempotent).
+
+        Returns:
+            (added, skipped): newly added addresses and addresses that were
+            already blacklisted or could not be parsed.
+        """
+        added: list[str] = []
+        skipped: list[str] = []
+        now = datetime.now(timezone.utc)
+        with self._lock:
+            for raw_email in emails:
+                normalized = normalize_email(raw_email)
+                if not normalized:
+                    skipped.append(raw_email.strip())
+                    continue
+                if any(e.email == normalized for e in self._blacklist):
+                    skipped.append(normalized)
+                    continue
+                self._blacklist.append(
+                    EmailBlacklistEntry(email=normalized, added_at=now, note=note.strip())
+                )
+                added.append(normalized)
+            if added:
+                self._save()
+        if added:
+            logger.info("Added %d email(s) to blacklist", len(added))
+        return added, skipped
+
+    def remove_from_blacklist(self, email: str) -> bool:
+        """Remove an email address from the blacklist."""
+        normalized = normalize_email(email)
+        with self._lock:
+            before = len(self._blacklist)
+            self._blacklist = [e for e in self._blacklist if e.email != normalized]
+            removed = len(self._blacklist) < before
+            if removed:
+                self._save()
+        if removed:
+            logger.info("Removed %s from blacklist", normalized)
+        return removed
+
+    def clear_blacklist(self) -> int:
+        """Remove all blacklist entries. Returns the number removed."""
+        with self._lock:
+            count = len(self._blacklist)
+            self._blacklist = []
+            if count:
+                self._save()
+        if count:
+            logger.info("Cleared email blacklist (%d entries removed)", count)
+        return count
+
+    def filter_blacklisted(
+        self, recipients: list[dict[str, Any]]
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        """Split recipients into (to_send, blocked) based on the blacklist."""
+        to_send: list[dict[str, Any]] = []
+        blocked: list[dict[str, Any]] = []
+        with self._lock:
+            blacklisted = {e.email for e in self._blacklist}
+        for recipient in recipients:
+            if normalize_email(recipient.get("email", "")) in blacklisted:
+                blocked.append(recipient)
+            else:
+                to_send.append(recipient)
+        return to_send, blocked
+
     # ---------------------------------------------------------------- Sending
 
     def create_send(
@@ -383,13 +492,19 @@ class EmailSenderStore:
         recipients: list[dict[str, Any]],
         delay_seconds: float,
         test: bool = False,
+        blocked_emails: Optional[set[str]] = None,
     ) -> None:
         """Send emails to all recipients in the background.
 
         Emails are sent sequentially with a configurable delay. In ``test``
         mode every personalized email is sent to the configured test recipient
         address instead of the real recipient.
+
+        Recipients whose email is in ``blocked_emails`` (the do-not-contact
+        blacklist) are not sent to; they are recorded in the send history
+        with status ``skipped``.
         """
+        blocked_emails = blocked_emails or set()
         self._active_sends.add(history_id)
         cancel_event = self._cancel_events.get(history_id) or asyncio.Event()
         self._cancel_events[history_id] = cancel_event
@@ -413,6 +528,20 @@ class EmailSenderStore:
                     logger.info("Send batch %s cancelled", history_id[:8])
                     self._cancel_pending(history_id)
                     return
+
+                if normalize_email(recipient.get("email", "")) in blocked_emails:
+                    logger.info(
+                        "Skipping blacklisted recipient %s in batch %s",
+                        recipient.get("email"),
+                        history_id[:8],
+                    )
+                    self.set_entry_status(
+                        history_id,
+                        recipient["email"],
+                        "skipped",
+                        error="On email blacklist (do not contact)",
+                    )
+                    continue
 
                 try:
                     to_email = smtp.test_recipient_email.strip() if test else recipient["email"]
@@ -456,6 +585,17 @@ class EmailSenderStore:
         finally:
             self._active_sends.discard(history_id)
             self._cancel_events.pop(history_id, None)
+
+
+def normalize_email(email: str) -> str:
+    """Normalize an email address for blacklist lookups (lowercase, trimmed).
+
+    Returns an empty string if the address is not plausibly an email address.
+    """
+    normalized = (email or "").strip().lower()
+    if not normalized or "@" not in normalized or normalized.startswith("@") or normalized.endswith("@"):
+        return ""
+    return normalized
 
 
 def render_template(

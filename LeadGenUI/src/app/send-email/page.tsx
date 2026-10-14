@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { crawlerApi } from "@/lib/api";
-import { StatsResponse } from "@/lib/types";
+import { StatsResponse, EmailBlacklistEntry } from "@/lib/types";
 import HeaderNav from "@/components/Shared/HeaderNav";
 import EmailSender from "@/components/Email/EmailSender";
+import BlacklistManager from "@/components/Email/BlacklistManager";
 import SendHistory from "@/components/Email/SendHistory";
 
 export default function SendEmailPage() {
@@ -12,6 +13,7 @@ export default function SendEmailPage() {
   const [crawlerOnline, setCrawlerOnline] = useState(false);
   const [loading, setLoading] = useState(true);
   const [historyTrigger, setHistoryTrigger] = useState(0);
+  const [blacklist, setBlacklist] = useState<EmailBlacklistEntry[]>([]);
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -25,11 +27,21 @@ export default function SendEmailPage() {
     }
   }, []);
 
+  const fetchBlacklist = useCallback(async () => {
+    try {
+      const data = await crawlerApi.getBlacklist();
+      setBlacklist(data.entries);
+    } catch {
+      // Blacklist is non-critical; the manager shows its own errors.
+    }
+  }, []);
+
   useEffect(() => {
     fetchStatus();
+    fetchBlacklist();
     const interval = setInterval(fetchStatus, 10000);
     return () => clearInterval(interval);
-  }, [fetchStatus]);
+  }, [fetchStatus, fetchBlacklist]);
 
   const handleSendStarted = () => {
     setHistoryTrigger((prev) => prev + 1);
@@ -54,7 +66,8 @@ export default function SendEmailPage() {
           </div>
         ) : (
           <>
-            <EmailSender onSendStarted={handleSendStarted} />
+            <EmailSender onSendStarted={handleSendStarted} blacklist={blacklist} />
+            <BlacklistManager blacklist={blacklist} onBlacklistChange={setBlacklist} />
             <SendHistory refreshTrigger={historyTrigger} />
           </>
         )}

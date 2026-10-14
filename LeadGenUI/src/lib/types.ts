@@ -221,7 +221,27 @@ export interface EmailSendResponse {
   job_id: string;
   template_id: string;
   total_recipients: number;
+  skipped_blacklisted?: number;
   started_at: string;
+}
+
+// --- Email Blacklist Types ---
+
+export interface EmailBlacklistEntry {
+  email: string;
+  added_at: string;
+  note?: string;
+}
+
+export interface EmailBlacklistAddResponse {
+  added: string[];
+  skipped: string[];
+  total: number;
+}
+
+export interface EmailBlacklistCheckResponse {
+  blacklisted: string[];
+  clean: string[];
 }
 
 export interface EmailSendHistoryEntry {

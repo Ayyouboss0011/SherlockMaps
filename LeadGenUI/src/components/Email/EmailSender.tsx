@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { crawlerApi } from "@/lib/api";
-import { HistoryEntry, EmailTemplate, SmtpSettings } from "@/lib/types";
+import { HistoryEntry, EmailTemplate, SmtpSettings, EmailBlacklistEntry } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ interface Recipient {
 
 interface EmailSenderProps {
   onSendStarted: () => void;
+  blacklist: EmailBlacklistEntry[];
 }
 
 const PREFS_STORAGE_KEY = "leadgen.sendEmails.prefs";
@@ -48,7 +49,7 @@ function savePrefs(prefs: SendEmailsPrefs) {
   }
 }
 
-export default function EmailSender({ onSendStarted }: EmailSenderProps) {
+export default function EmailSender({ onSendStarted, blacklist }: EmailSenderProps) {
   const [jobs, setJobs] = useState<HistoryEntry[]>([]);
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [smtp, setSmtp] = useState<SmtpSettings | null>(null);
@@ -63,6 +64,15 @@ export default function EmailSender({ onSendStarted }: EmailSenderProps) {
   const [hydrated, setHydrated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const blockedEmails = useMemo(
+    () => new Set(blacklist.map((e) => e.email.toLowerCase())),
+    [blacklist]
+  );
+  const blockedRecipients = useMemo(
+    () => recipients.filter((r) => blockedEmails.has(r.email.toLowerCase())),
+    [recipients, blockedEmails]
+  );
 
   const load = useCallback(async () => {
     try {
@@ -156,11 +166,14 @@ export default function EmailSender({ onSendStarted }: EmailSenderProps) {
         delaySeconds,
         testMode
       );
+      const skipped = response.skipped_blacklisted ?? 0;
+      const skipNote =
+        skipped > 0 ? ` ${skipped} blacklisted recipient(s) were skipped.` : "";
       setMessage({
         type: "success",
         text: testMode
-          ? `Test run started: ${response.total_recipients} personalized emails will be sent to ${smtp?.test_recipient_email || "the test address"}.`
-          : `Sending started: ${response.total_recipients} recipients in queue.`,
+          ? `Test run started: ${response.total_recipients} personalized emails will be sent to ${smtp?.test_recipient_email || "the test address"}.${skipNote}`
+          : `Sending started: ${response.total_recipients} recipients in queue.${skipNote}`,
       });
       onSendStarted();
     } catch (err: any) {
@@ -320,6 +333,11 @@ export default function EmailSender({ onSendStarted }: EmailSenderProps) {
               <Badge variant="secondary" className="ml-2 text-xs h-4">
                 {recipientsLoading ? "..." : recipients.length}
               </Badge>
+              {!recipientsLoading && blockedRecipients.length > 0 && (
+                <Badge variant="secondary" className="ml-2 text-xs h-4 bg-red-500/10 text-red-600 border-red-500/20">
+                  {blockedRecipients.length} blocked by blacklist
+                </Badge>
+              )}
             </p>
           </div>
 
@@ -342,15 +360,32 @@ export default function EmailSender({ onSendStarted }: EmailSenderProps) {
                   <tr className="border-b border-border/40">
                     <th className="text-left font-medium text-muted-foreground px-2.5 py-1.5">Email</th>
                     <th className="text-left font-medium text-muted-foreground px-2.5 py-1.5">Company</th>
+                    <th className="text-left font-medium text-muted-foreground px-2.5 py-1.5">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recipients.map((recipient, idx) => (
-                    <tr key={idx} className="border-b border-border/30 last:border-0">
-                      <td className="px-2.5 py-1.5 font-mono text-muted-foreground">{recipient.email}</td>
-                      <td className="px-2.5 py-1.5">{recipient.company_name || "-"}</td>
-                    </tr>
-                  ))}
+                  {recipients.map((recipient, idx) => {
+                    const isBlocked = blockedEmails.has(recipient.email.toLowerCase());
+                    return (
+                      <tr key={idx} className="border-b border-border/30 last:border-0">
+                        <td className={`px-2.5 py-1.5 font-mono ${isBlocked ? "text-muted-foreground line-through" : "text-muted-foreground"}`}>
+                          {recipient.email}
+                        </td>
+                        <td className="px-2.5 py-1.5">{recipient.company_name || "-"}</td>
+                        <td className="px-2.5 py-1.5">
+                          {isBlocked ? (
+                            <Badge variant="secondary" className="text-xs h-4 px-1.5 bg-red-500/10 text-red-600 border-red-500/20">
+                              Not sent
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs h-4 px-1.5 bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                              Will be sent
+                            </Badge>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

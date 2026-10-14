@@ -28,6 +28,10 @@ const STATUS_STYLES: Record<string, { className: string; label: string }> = {
     className: "bg-gray-500/10 text-gray-500 border-gray-500/20",
     label: "Cancelled",
   },
+  skipped: {
+    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    label: "Skipped (blacklist)",
+  },
 };
 
 export default function SendHistory({ refreshTrigger }: SendHistoryProps) {
