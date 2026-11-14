@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/e34a9eae-2a95-49cb-9bde-ccf513b0d0a2.png" alt="SherlockMaps Banner Icon" width="200">
+  <img src="public/e34a9eae-2a95-49cb-9bde-ccf513b0d0a2.png" alt="Sherlock Maps Banner" width="100%">
 </div>
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Playwright](https://img.shields.io/badge/browser--automation-playwright-green.svg)](https://playwright.dev/)
