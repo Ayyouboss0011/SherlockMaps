@@ -19,6 +19,7 @@ export default function CrawlForm({ onCrawlStarted, onError }: CrawlFormProps) {
   const [headless, setHeadless] = useState(false);
   const [trackReviews, setTrackReviews] = useState(true);
   const [autoEmailCrawl, setAutoEmailCrawl] = useState(false);
+  const [usePersistentProfile, setUsePersistentProfile] = useState(false);
   const [maxResults, setMaxResults] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -41,6 +42,7 @@ export default function CrawlForm({ onCrawlStarted, onError }: CrawlFormProps) {
         headless,
         track_reviews: trackReviews,
         auto_email_crawl: autoEmailCrawl,
+        use_persistent_profile: usePersistentProfile,
         max_results: maxResults ? parseInt(maxResults, 10) : undefined,
       });
       setSuccessMessage(
@@ -156,6 +158,46 @@ export default function CrawlForm({ onCrawlStarted, onError }: CrawlFormProps) {
             </span>
           </div>
 
+          {/* Browser Profile Toggle */}
+          <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/30 px-4 py-3">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Use Chrome profile
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Reuse cookies and logins from CHROME_PROFILE_PATH; bundled extensions always load
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => !isLoading && setUsePersistentProfile(!usePersistentProfile)}
+              disabled={isLoading}
+              className={`
+                relative inline-flex h-[22px] w-[42px] shrink-0 cursor-pointer items-center rounded-full transition-colors
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                disabled:cursor-not-allowed disabled:opacity-50
+                ${usePersistentProfile ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"}
+              `}
+              aria-label="Use persistent Chrome profile"
+              aria-checked={usePersistentProfile}
+              role="switch"
+            >
+              <span
+                className={`
+                  pointer-events-none inline-block h-[18px] w-[18px] rounded-full bg-white shadow-md
+                  transform transition-transform duration-150 ease-in-out
+                  ${usePersistentProfile ? "translate-x-[22px]" : "translate-x-[2px]"}
+                `}
+              />
+            </button>
+            <span className={`text-xs font-medium select-none w-6 text-right ${usePersistentProfile ? "text-blue-600" : "text-gray-400"}`}>
+              {usePersistentProfile ? "On" : "Off"}
+            </span>
+          </div>
+
           {/* Options Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Max Results */}
@@ -176,12 +218,20 @@ export default function CrawlForm({ onCrawlStarted, onError }: CrawlFormProps) {
             </div>
 
             {/* Headless Toggle */}
-            <div className="flex items-center pt-6">
-              <Switch
-                checked={headless}
-                onCheckedChange={setHeadless}
-                disabled={isLoading}
-              />
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                Headless Mode
+              </Label>
+              <div className="flex items-center gap-2 h-9">
+                <Switch
+                  checked={headless}
+                  onCheckedChange={setHeadless}
+                  disabled={isLoading}
+                />
+                <span className={`text-xs font-medium select-none ${headless ? "text-blue-600" : "text-gray-400"}`}>
+                  {headless ? "On" : "Off"}
+                </span>
+              </div>
             </div>
           </div>
 

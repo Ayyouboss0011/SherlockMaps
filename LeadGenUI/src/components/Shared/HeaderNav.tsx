@@ -26,9 +26,9 @@ export default function HeaderNav({ crawlerOnline, stats }: HeaderNavProps) {
           <div className="flex items-center gap-2.5">
             <Link href="/" className="flex items-center gap-2.5">
               <img
-                src="/SherlockMaps.png"
-                alt="SherlockMaps"
-                className="w-10 h-10 object-contain"
+                src="/sherlock-icon.png"
+                alt="Sherlock Maps"
+                className="w-8 h-8 object-contain"
               />
               <div>
                 <h1 className="text-sm font-medium text-foreground leading-none">

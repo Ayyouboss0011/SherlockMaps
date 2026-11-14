@@ -11,6 +11,7 @@ export interface CrawlRequest {
   max_results?: number;
   track_reviews?: boolean;
   auto_email_crawl?: boolean;
+  use_persistent_profile?: boolean;
 }
 
 export interface EmailCrawlResponse {

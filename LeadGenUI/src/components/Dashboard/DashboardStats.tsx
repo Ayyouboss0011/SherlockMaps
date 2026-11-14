@@ -62,7 +62,8 @@ export default function DashboardStats({
       label: "Errors",
       value: String(stats?.total_failed ?? 0),
       dotColor: "bg-transparent",
-      valueColor: "text-red-600",
+      valueColor:
+        (stats?.total_failed ?? 0) > 0 ? "text-red-600" : "text-muted-foreground",
     },
   ];
 

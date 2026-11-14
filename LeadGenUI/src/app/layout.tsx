@@ -7,8 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "SherlockMaps - Lead Generation Dashboard",
-  description: "Google Maps Crawler Lead Generation Interface",
+  title: "Sherlock Maps — Lead Generation Dashboard",
+  description: "Crawl Google Maps, enrich company emails, and export leads.",
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
         <TooltipProvider>
           {children}

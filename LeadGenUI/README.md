@@ -1,105 +1,76 @@
-# SherlockMaps - Lead Generation Dashboard
+# Sherlock Maps dashboard
 
-Eine NextJS Web-Oberflache zum Steuern des Google Maps Crawler Docker-Containers.
+The Next.js dashboard for Sherlock Maps. It provides:
 
-## Funktionen
+- Live crawler status and KPIs
+- Crawl form with review, email-enrichment and browser-profile options
+- Job history with expandable company results
+- Search and CSV/JSON export
+- Email campaign composer, SMTP settings and templates
+- Do-not-contact blacklist with CSV/XLSX import
+- Send history
 
-- **Dashboard-Overview**: Echtzeit-Status des Crawlers mit Statistiken
-- **Crawl starten**: Suchbegriff eingeben, Optionen wahlen und Crawl starten
-- **Job-Verwaltung**: Alle Crawl-Jobs uberwachen, Details ansehen und Jobs abbrechen
-- **Ergebnisse**: Gesammelte Daten durchsuchen, exportieren (JSON/CSV) und verwalten
-- **Echtzeit-Updates**: Automatische Aktualisierung alle 10 Sekunden
+## Local development
 
-## Voraussetzungen
-
-- Node.js 18+ 
-- npm oder yarn
-- Laufender Google Maps Crawler Docker-Container (auf Port 8000)
-
-## Installation
-
-1. Abhangigkeiten installieren:
+Requirements: Node.js 18+ and a running crawler API.
 
 ```bash
-cd LeadGenUI
 npm install
 ```
 
-2. Umgebungsvariablen konfigurieren:
+Create `.env.local`:
 
-Die Datei `.env.local` enthält die Konfiguration:
-
-```
+```dotenv
+NEXT_PUBLIC_CRAWLER_API_URL=http://localhost:8000
 CRAWLER_API_URL=http://localhost:8000
 ```
 
-Falls der Crawler auf einem anderen Port oder Host lauft, bitte hier anpassen.
-
-3. Development-Server starten:
+Start the dashboard:
 
 ```bash
 npm run dev
 ```
 
-Die Anwendung ist nun unter http://localhost:3000 verfullbar.
+Open <http://localhost:3000>.
 
-## Produktion
+## Docker
 
-Build fur Produktion:
+The dashboard is part of the root `docker-compose.yml`:
 
 ```bash
-npm run build
-npm start
+cd ..
+docker compose up -d --build
 ```
 
-## Projektstruktur
+Open <http://localhost:3008>. The API is available at
+<http://localhost:6970> and its Swagger UI at
+<http://localhost:6970/docs>.
 
-```
-LeadGenUI/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx          # Root-Layout
-│   │   ├── page.tsx            # Hauptseite (Dashboard)
-│   │   └── globals.css         # Globale Styles (Tailwind)
-│   ├── components/
-│   │   ├── Dashboard/
-│   │   │   └── DashboardStats.tsx   # Statistik-Karten
-│   │   ├── Crawl/
-│   │   │   └── CrawlForm.tsx         # Crawl-Start Formular
-│   │   ├── Jobs/
-│   │   │   └── JobList.tsx           # Job-Liste mit Details
-│   │   ├── Results/
-│   │   │   └── ResultsTable.tsx      # Ergebnisse Tabelle
-│   │   └── Shared/
-│   │       └── StatusBadge.tsx       # Status-Anzeige
-│   └── lib/
-│       ├── api.ts              # API-Client fur Crawler-API
-│       └── types.ts            # TypeScript Typ-Definitionen
-├── public/                     # Statische Dateien
-├── .env.local                  # Umgebungsvariablen
-├── next.config.js              # NextJS Konfiguration
-├── tailwind.config.ts          # Tailwind Konfiguration
-├── tsconfig.json               # TypeScript Konfiguration
-└── package.json
+## Environment
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_CRAWLER_API_URL` | API URL used by the browser; inlined at build time |
+| `CRAWLER_API_URL` | API URL used by the Next.js server/proxy |
+
+Changing `NEXT_PUBLIC_*` requires a rebuild.
+
+## Scripts
+
+```bash
+npm run dev      # development server
+npm run build    # production build
+npm run start    # production server
+npm run lint     # Next.js lint
 ```
 
-## Verfullbare API-Endpunkte
+For screenshots, run the build with `NEXT_PUBLIC_CRAWLER_API_URL=/api`, start
+the app, then run `python ../scripts/capture_screenshots.py` from the repository
+root.
 
-Die UI kommuniziert mit dem Google Maps Crawler uber folgende Endpunkte:
+## Documentation
 
-| Methode | Endpunkt | Beschreibung |
-|---------|----------|--------------|
-| GET | `/health` | Health Check |
-| GET | `/status` | Aktueller Status |
-| GET | `/stats` | Statistiken |
-| POST | `/crawl` | Neuen Crawl starten |
-| GET | `/crawl/{id}` | Job-Status abrufen |
-| GET | `/crawl/{id}/results` | Job-Ergebnisse |
-| DELETE | `/crawl/{id}` | Job abbrechen |
-| GET | `/crawl/history` | Crawl-Historie |
-| GET | `/results` | Alle Ergebnisse |
-| DELETE | `/results/clear` | Ergebnisse loschen |
-
-## Lizenz
-
-MIT
+- [Quick start](../docs/quickstart.md)
+- [Configuration](../docs/configuration.md)
+- [REST API](../docs/api.md)
+- [Browser profile](../docs/browser-profile.md)

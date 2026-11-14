@@ -291,7 +291,7 @@ export default function CombinedTable({ refreshTrigger }: CombinedTableProps) {
   }
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border/40" data-testid="crawl-results-card">
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-foreground">
@@ -449,7 +449,7 @@ export default function CombinedTable({ refreshTrigger }: CombinedTableProps) {
                         {isExpanded && (
                           <TableRow className="bg-muted/20 border-b">
                             <TableCell colSpan={8}>
-                              <div className="p-3 space-y-3">
+                              <div className="p-3 space-y-3" data-testid="company-results">
                                 <div className="flex items-center justify-between">
                                   <h3 className="text-xs font-medium text-muted-foreground">
                                     Company Results: {job.prompt}
@@ -520,7 +520,8 @@ export default function CombinedTable({ refreshTrigger }: CombinedTableProps) {
                                                   href={row.website}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  className="text-blue-600 hover:text-blue-700 underline"
+                                                  className="block truncate text-blue-600 hover:text-blue-700 underline"
+                                                  title={row.website}
                                                 >
                                                   {row.website}
                                                 </a>
@@ -528,12 +529,12 @@ export default function CombinedTable({ refreshTrigger }: CombinedTableProps) {
                                                 "-"
                                               )}
                                             </TableCell>
-                                            <TableCell className="max-w-[180px] truncate text-xs">
+                                            <TableCell className="max-w-[180px] text-xs">
                                               {row.emails && row.emails.length > 0 ? (
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex min-w-0 items-center gap-1">
                                                   <a
                                                     href={`mailto:${row.emails.join(",")}`}
-                                                    className="text-blue-500 hover:underline font-mono text-[10px]"
+                                                    className="truncate text-blue-500 hover:underline font-mono text-[10px]"
                                                     title={row.emails.join(", ")}
                                                   >
                                                     {row.emails.join(", ")}
@@ -541,7 +542,7 @@ export default function CombinedTable({ refreshTrigger }: CombinedTableProps) {
                                                   <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-4 w-4 p-0 hover:bg-muted"
+                                                    className="h-4 w-4 flex-shrink-0 p-0 hover:bg-muted"
                                                     onClick={() => handleCopyEmail(row.emails?.join(", ") || "")}
                                                     title="Copy emails"
                                                   >
@@ -551,17 +552,18 @@ export default function CombinedTable({ refreshTrigger }: CombinedTableProps) {
                                                   </Button>
                                                 </div>
                                               ) : row.email ? (
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex min-w-0 items-center gap-1">
                                                   <a
                                                     href={`mailto:${row.email}`}
-                                                    className="text-blue-500 hover:underline font-mono"
+                                                    className="truncate text-blue-500 hover:underline font-mono"
+                                                    title={row.email}
                                                   >
                                                     {row.email}
                                                   </a>
                                                   <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-4 w-4 p-0 hover:bg-muted"
+                                                    className="h-4 w-4 flex-shrink-0 p-0 hover:bg-muted"
                                                     onClick={() => handleCopyEmail(row.email || "")}
                                                     title="Copy email"
                                                   >

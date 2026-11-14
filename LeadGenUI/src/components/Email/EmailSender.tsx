@@ -204,7 +204,7 @@ export default function EmailSender({ onSendStarted, blacklist }: EmailSenderPro
 
   return (
     <CollapsibleCard
-      title="Send Emails"
+      title="Campaign Composer"
       description="Send an email template to all crawled contacts of a completed job."
       storageKey="leadgen.card.sendEmails"
       contentClassName="space-y-4"
@@ -353,7 +353,7 @@ export default function EmailSender({ onSendStarted, blacklist }: EmailSenderPro
               No email addresses found in this job.
             </p>
           ) : (
-            <div className="max-h-48 overflow-auto rounded-md border border-border/40">
+            <div className="max-h-48 overflow-auto rounded-md border border-border/40" data-testid="recipients-table">
               <table className="w-full text-xs">
                 <thead className="sticky top-0 bg-card">
                   <tr className="border-b border-border/40">

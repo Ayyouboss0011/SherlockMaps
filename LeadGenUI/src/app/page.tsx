@@ -59,6 +59,21 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        {/* Page heading */}
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Dashboard
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Crawl Google Maps, enrich company emails, and export clean lead lists.
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground">
+            Self-hosted · No per-result fees
+          </span>
+        </div>
+
         {/* Dashboard Stats */}
         <DashboardStats
           status={status}
