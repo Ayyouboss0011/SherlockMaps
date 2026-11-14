@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/Ayyouboss0011/SherlockMaps/tree/main/docs
+    about: Setup, configuration, API and browser-profile guides.
+  - name: Questions and use cases
+    url: https://github.com/Ayyouboss0011/SherlockMaps/discussions
+    about: Ask for help or share what you built with Sherlock Maps.
+  - name: Security report
+    url: https://github.com/Ayyouboss0011/SherlockMaps/security/advisories/new
+    about: Report a vulnerability privately.

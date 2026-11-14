@@ -1,0 +1,77 @@
+name: Bug report
+description: Report a reproducible problem with Sherlock Maps
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please remove cookies,
+        SMTP passwords and personal data from logs before submitting.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start `docker compose up -d --build`
+        2. Open ...
+        3. Start a crawl with ...
+        4. See error
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: "v1.0.0 or commit SHA"
+    validations:
+      required: true
+  - type: dropdown
+    id: setup
+    attributes:
+      label: Setup
+      options:
+        - Docker Compose
+        - Local backend + local UI
+        - CLI only
+        - Python library
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: browser_mode
+    attributes:
+      label: Browser mode
+      options:
+        - Headed
+        - Headless
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Redact secrets and personal data.
+      render: shell
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: OS, Python/Node versions, search term, job ID, screenshots, etc.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues before opening this report.
+          required: true
+        - label: I removed secrets and personal data from logs.
+          required: true
