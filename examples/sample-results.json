@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Café Morgenrot",
+    "category": "Café",
+    "address": "Torstraße 12, 10119 Berlin",
+    "phone": "+49 30 1234 5678",
+    "website": "https://cafemorgenrot.example",
+    "rating": "4.8",
+    "reviews_count": "214",
+    "plus_code": "GVMF+8H Berlin",
+    "opening_hours": "Mon-Fri: 08:00-18:00, Sat-Sun: 09:00-16:00",
+    "attributes": ["Outdoor seating", "Wheelchair accessible entrance"],
+    "emails": ["hello@cafemorgenrot.example"],
+    "email_status": "completed"
+  },
+  {
+    "name": "Trattoria Bellavista",
+    "category": "Italian restaurant",
+    "address": "Kastanienallee 44, 10435 Berlin",
+    "phone": "+49 30 2345 6789",
+    "website": "https://bellavista.example",
+    "rating": "4.7",
+    "reviews_count": "389",
+    "plus_code": "GVMF+9J Berlin",
+    "opening_hours": "Daily: 12:00-23:00",
+    "attributes": ["Reservations required", "Vegetarian options"],
+    "emails": ["info@bellavista.example"],
+    "email_status": "completed"
+  },
+  {
+    "name": "Nordic Roast",
+    "category": "Coffee shop",
+    "address": "Oranienstraße 7, 10999 Berlin",
+    "phone": "+49 30 3456 7890",
+    "website": "https://nordicroast.example",
+    "rating": "4.9",
+    "reviews_count": "512",
+    "plus_code": "GVMF+7K Berlin",
+    "opening_hours": "Mon-Sun: 07:30-19:00",
+    "attributes": ["Takeaway", "Wi-Fi"],
+    "emails": ["hello@nordicroast.example"],
+    "email_status": "completed"
+  }
+]

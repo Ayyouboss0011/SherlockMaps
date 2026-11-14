@@ -1,0 +1,4 @@
+name,category,address,phone,website,rating,reviews_count,plus_code,opening_hours,attributes,emails,email_status
+Café Morgenrot,Café,"Torstraße 12, 10119 Berlin",+49 30 1234 5678,https://cafemorgenrot.example,4.8,214,GVMF+8H Berlin,"Mon-Fri: 08:00-18:00, Sat-Sun: 09:00-16:00","Outdoor seating; Wheelchair accessible entrance",hello@cafemorgenrot.example,completed
+Trattoria Bellavista,Italian restaurant,"Kastanienallee 44, 10435 Berlin",+49 30 2345 6789,https://bellavista.example,4.7,389,GVMF+9J Berlin,Daily: 12:00-23:00,"Reservations required; Vegetarian options",info@bellavista.example,completed
+Nordic Roast,Coffee shop,"Oranienstraße 7, 10999 Berlin",+49 30 3456 7890,https://nordicroast.example,4.9,512,GVMF+7K Berlin,Mon-Sun: 07:30-19:00,"Takeaway; Wi-Fi",hello@nordicroast.example,completed

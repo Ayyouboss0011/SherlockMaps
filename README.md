@@ -1,653 +1,264 @@
 <div align="center">
-  <img src="public/e34a9eae-2a95-49cb-9bde-ccf513b0d0a2.png" alt="Sherlock Maps Banner" width="100%">
+  <img src="docs/assets/banner.webp" alt="Sherlock Maps — Google Maps scraper and lead generation suite" width="100%">
+  <h1>Sherlock Maps</h1>
+  <p><strong>Turn Google Maps searches into clean, enriched lead lists — self-hosted and open source.</strong></p>
+  <p>
+    <a href="https://github.com/Ayyouboss0011/SherlockMaps/stargazers"><img src="https://img.shields.io/github/stars/Ayyouboss0011/SherlockMaps?style=social" alt="GitHub stars"></a>
+    <a href="https://github.com/Ayyouboss0011/SherlockMaps/releases"><img src="https://img.shields.io/github/v/release/Ayyouboss0011/SherlockMaps?display_name=release&sort=semver" alt="Latest release"></a>
+    <a href="https://github.com/Ayyouboss0011/SherlockMaps/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Ayyouboss0011/SherlockMaps/ci.yml?branch=main&label=CI" alt="CI status"></a>
+    <img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python 3.9+">
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
+    <a href="https://docs.docker.com/compose/"><img src="https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white" alt="Docker Compose"></a>
+  </p>
 </div>
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Playwright](https://img.shields.io/badge/browser--automation-playwright-green.svg)](https://playwright.dev/)
+<p align="center">
+  <a href="docs/assets/screenshots/hero.png">
+    <img src="docs/assets/screenshots/hero.png" alt="Sherlock Maps dashboard" width="100%">
+  </a>
+</p>
 
-A professional, open-source Google Maps web crawler that extracts company information from Google Maps. Built with [Playwright](https://playwright.dev/) for browser automation.
+Sherlock Maps is a self-hosted Google Maps crawler and lead-generation suite. It
+extracts business names, categories, addresses, phone numbers, websites,
+ratings, reviews, opening hours and attributes — then enriches companies with
+email addresses from their websites.
 
-<div align="center">
-  <h2>Sherlock Maps</h2>
-  <p>Open-Source Google Maps Webcrawler</p>
-</div>
+Use the Next.js dashboard to start crawls, inspect results, export CSV/JSON and
+run email campaigns. Use the REST API or Python library when you want to build
+your own workflow.
+
+## Why Sherlock Maps?
+
+- **Self-hosted and open source** — your data stays on your infrastructure.
+- **No per-result fees** — no paid scraper API and no credit-based pricing.
+- **Full lead pipeline** — Google Maps → company data → email enrichment → export or outreach.
+- **Developer-friendly** — REST API, Python library, Docker Compose and a typed Next.js UI.
+- **Reproducible browser setup** — bundled cookie-consent extension plus optional local Chrome profile.
 
 ## Features
 
-- **Object-Oriented** - Cleanly structured with classes, dataclasses, and design patterns
-- **Search** - Search Google Maps with any search term
-- **Detailed Company Information** extraction:
-  - Company name
-  - Category / Industry
-  - Address
-  - Phone number
-  - Website URL
-  - Rating (stars)
-  - Number of reviews
-  - Plus Code
-  - Opening hours
-  - Attributes (wheelchair accessibility, etc.)
-- **Deduplication** based on company name + website
-- **URL Validation** (filters out invalid websites)
-- **Multiple Output Formats**: JSON, CSV, Pretty-Print, File, Print
-- **REST API** - Asynchronous job queue server with full-featured endpoints
-- **Email Crawling** - Extract email addresses from company websites
-- **Docker Support** - Containerized deployment
-- **Chrome Profile Persistence** - Session data persists between runs
+**Crawling**
+- Search Google Maps with any query
+- Company name, category, address, phone, website, rating, review count, Plus Code, opening hours and attributes
+- Optional review extraction
+- Deduplication and website URL validation
+- Configurable result limits and scroll behavior
 
----
+**Lead enrichment**
+- Crawl company websites for email addresses
+- Follow contact, imprint and about pages
+- Deduplicate emails and keep source metadata
+- Auto-trigger email enrichment after a map crawl
 
-## Quick Start
+**Dashboard**
+- Live crawler status and KPIs
+- Job history with expandable company results
+- Search, inspect and export leads
+- SMTP settings, email templates and campaign history
+- Do-not-contact blacklist with CSV/XLSX import
 
-### Option 1: Docker (Recommended)
+**Deployment**
+- One-command Docker Compose stack
+- Persistent jobs, results, SMTP data and Chrome profile
+- REST API with Swagger UI
+- JSON, CSV, pretty-printed and file output
+- Local Python + Next.js development workflow
 
-The easiest way to get started. Docker handles all dependencies, Playwright, and browser setup automatically.
+## Quick start
 
-#### Using docker-compose (Simplest)
+### Docker Compose (recommended)
 
 ```bash
-# Clone the repository
 git clone https://github.com/Ayyouboss0011/SherlockMaps.git
 cd SherlockMaps
-
-# Start the API server
-docker compose up -d
-
-# The API is now running at http://localhost:8000
-# Interactive documentation: http://localhost:8000/docs
+cp .env.example .env
+docker compose up -d --build
 ```
 
-#### Start a crawl via API
+Open:
+
+- **Dashboard:** <http://localhost:3008>
+- **API:** <http://localhost:6970>
+- **Swagger UI:** <http://localhost:6970/docs>
+
+Start a crawl from the dashboard or with the API:
 
 ```bash
-curl -X POST http://localhost:8000/crawl \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "restaurants berlin"}'
-```
-
-#### Get results
-
-```bash
-# Check job status
-curl http://localhost:8000/status
-
-# Get all results
-curl http://localhost:8000/results
-```
-
-#### Stop the container
-
-```bash
-docker compose down
-```
-
-#### Using Docker CLI (without docker-compose)
-
-```bash
-# Clone the repository
-git clone https://github.com/Ayyouboss0011/SherlockMaps.git
-cd GoogleMapsCrawler
-
-# Build the image
-cd core && docker build -t sherlock-maps . && cd ..
-
-# Run as API server
-docker run -d -p 8000:8000 --name sherlock-maps sherlock-maps
-
-# Run in CLI mode (one-time crawl)
-docker run --rm -e PROMPT="restaurants berlin" sherlock-maps python /app/core/main_cli.py
-```
-
----
-
-### Option 2: Without Docker
-
-Install Python dependencies manually and run the crawler directly.
-
-#### Prerequisites
-
-- Python 3.9 or higher
-- Git
-
-#### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Ayyouboss0011/SherlockMaps.git
-cd GoogleMapsCrawler
-
-# Install Python dependencies
-cd core
-pip install -r requirements.txt
-
-# Install Playwright browsers
-playwright install chromium
-```
-
-#### Run the CLI crawler
-
-```bash
-# Set search term
-export PROMPT="restaurants berlin"
-
-# Run the crawler
-python main.py
-```
-
-#### Run the REST API server
-
-```bash
-# Start the API server on port 8000
-python api_main.py
-
-# The API is now running at http://localhost:8000
-# Interactive documentation: http://localhost:8000/docs
-```
-
-#### Start a crawl via API
-
-```bash
-curl -X POST http://localhost:8000/crawl \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "restaurants berlin"}'
-```
-
-#### Use as a Python library
-
-```python
-from core.crawler import run_crawler
-
-results = run_crawler(
-    prompt="restaurants berlin",
-    headless=False,
-    output_format="json"
-)
-
-for company in results:
-    print(f"{company.name} - {company.website}")
-```
-
----
-
-## CLI Mode
-
-The crawler can be used directly from the command line. All results are output to stdout as JSON by default.
-
-### Output Formats
-
-```bash
-# JSON to stdout (default)
-export PROMPT="restaurants berlin"
-python main.py
-
-# Save as JSON file
-export PROMPT="restaurants berlin"
-export OUTPUT_FORMAT="file"
-python main.py
-
-# Save as CSV file
-export PROMPT="restaurants berlin"
-export OUTPUT_FORMAT="csv"
-python main.py
-
-# Formatted output (one company per block)
-export PROMPT="restaurants berlin"
-export OUTPUT_FORMAT="print"
-python main.py
-
-# Human-readable output
-export PROMPT="restaurants berlin"
-export OUTPUT_FORMAT="pretty"
-python main.py
-
-# Headless mode (for production/servers)
-export PROMPT="restaurants berlin"
-export HEADLESS="true"
-python main.py
-```
-
-### Output Formats Overview
-
-| Format | Description |
-|---|---|
-| `json` | JSON array to stdout (default) |
-| `file` | Saves results as `sherlock-maps_YYYYMMDD_HHMMSS.json` |
-| `csv` | Saves results as `sherlock-maps_YYYYMMDD_HHMMSS.csv` |
-| `print` | Each company individually with separator |
-| `pretty` | Human-readable format with aligned fields |
-
-### Environment Variables
-
-| Variable | Description | Default |
-|---|---|---|
-| `PROMPT` | Search term for Google Maps | Required |
-| `OUTPUT_FORMAT` | Output format: `json`, `print`, `file`, `csv`, `pretty` | `json` |
-| `HEADLESS` | Run browser in headless mode | `false` |
-| `GOOGLE_API_KEY` | Optional Google API key | (empty) |
-
----
-
-## Python Library
-
-### Simple (Convenience Function)
-
-```python
-from core.crawler import run_crawler
-
-results = run_crawler(
-    prompt="restaurants berlin",
-    headless=False,
-    output_format="json"
-)
-
-for company in results:
-    print(f"{company.name} - {company.website}")
-```
-
-### Complete (With Configuration)
-
-```python
-from core.models import CrawlerConfig, CompanyData
-from core.crawler import GoogleMapsCrawler
-
-# Create configuration
-config = CrawlerConfig(
-    search_prompt="restaurants berlin",
-    headless=False,
-    output_format="pretty",
-)
-
-# Use crawler with context manager
-with GoogleMapsCrawler(config) as crawler:
-    results = crawler.crawl()
-
-# Process results
-for company in results:
-    if isinstance(company, CompanyData):
-        print(f"{company.name}: {company.rating} stars ({company.reviews_count} reviews)")
-```
-
-### Custom Search at Runtime
-
-```python
-from core.models import CrawlerConfig
-from core.crawler import GoogleMapsCrawler
-
-config = CrawlerConfig(
-    search_prompt="cafes berlin",
-    output_format="json",
-)
-
-with GoogleMapsCrawler(config) as crawler:
-    # First search
-    results1 = crawler.crawl()
-
-    # Second search with different term
-    results2 = crawler.crawl(prompt="restaurants munich")
-```
-
----
-
-## REST API
-
-The crawler can run as a persistent service with REST API. The container starts as an API server and can process multiple crawl jobs sequentially.
-
-### Start the API
-
-```bash
-# Build the image
-cd core
-docker build -t sherlock-maps .
-
-# Start API server (port 8000)
-docker run -p 8000:8000 sherlock-maps
-
-# With custom port
-docker run -p 8080:8080 -e API_PORT=8080 sherlock-maps
-```
-
-### API Endpoints
-
-#### Health & Status
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/health` | Health check (for Docker orchestrators) |
-| GET | `/status` | Current status (idle/busy), active jobs, queue length |
-| GET | `/stats` | Detailed statistics |
-
-#### Crawler Control
-
-| Method | Path | Description |
-|---|---|---|
-| POST | `/crawl` | Start a new crawl job |
-| GET | `/crawl/{job_id}` | Get job status |
-| GET | `/crawl/{job_id}/results` | Get job results |
-| DELETE | `/crawl/{job_id}` | Cancel a running job |
-| GET | `/crawl/history` | List all jobs with pagination |
-
-#### Data Management
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/results` | Get all results |
-| POST | `/results/export` | Export results |
-| DELETE | `/results/clear` | Clear all results |
-
-#### Configuration
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/config` | Get current configuration |
-| PUT | `/config` | Update configuration |
-
-#### Browser
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/browser/info` | Browser information |
-| POST | `/browser/restart` | Restart browser |
-
-### API Examples
-
-```bash
-# Start a new crawl job
-curl -X POST http://localhost:8000/crawl \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "restaurants berlin", "output_format": "json"}'
-
-# Get job status
-curl http://localhost:8000/crawl/<job_id>
-
-# Get results
-curl http://localhost:8000/crawl/<job_id>/results
-
-# Get all results as CSV
-curl "http://localhost:8000/results?format=csv"
-
-# Get status
-curl http://localhost:8000/status
-
-# Health check
-curl http://localhost:8000/health
-
-# Cancel job
-curl -X DELETE http://localhost:8000/crawl/<job_id>
-
-# Job history
-curl "http://localhost:8000/crawl/history?limit=10&offset=0"
-```
-
-### Request Example
-
-```json
-{
-  "prompt": "restaurants berlin",
-  "output_format": "json",
-  "headless": false,
-  "locale": "de-DE",
-  "max_results": 100
-}
-```
-
-### Response Example (Job Status)
-
-```json
-{
-  "job_id": "abc-123-def",
-  "status": "completed",
-  "prompt": "restaurants berlin",
-  "created_at": "2026-01-15T10:30:00Z",
-  "completed_at": "2026-01-15T10:31:30Z",
-  "results_count": 42,
-  "error": null
-}
-```
-
-### Job Status
-
-| Status | Description |
-|---|---|
-| `pending` | In the queue |
-| `running` | Currently running |
-| `completed` | Successfully completed |
-| `failed` | Failed |
-| `cancelled` | Cancelled |
-
-### Interactive API Documentation
-
-When the API server is running, interactive Swagger documentation is available:
-
-```
-http://localhost:8000/docs
-```
-
-#### Email Crawler
-
-The API supports crawling company websites for email addresses after a map crawl completes.
-
-| Method | Path | Description |
-|---|---|---|
-| POST | `/email-crawl` | Start an email crawl for a completed job |
-| GET | `/email-crawl/{job_id}` | Get email crawl job status |
-| GET | `/emails` | Get all emails with pagination |
-| DELETE | `/emails` | Clear all email results |
-
-**Auto-trigger Email Crawl:**
-
-Set `auto_email_crawl: true` in the crawl request to automatically start an email crawl after the map crawl completes:
-
-```bash
-curl -X POST http://localhost:8000/crawl \
+curl -X POST http://localhost:6970/crawl \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "restaurants berlin",
-    "auto_email_crawl": true
+    "auto_email_crawl": true,
+    "max_results": 50
   }'
 ```
 
-**Manual Email Crawl:**
-
-After a map crawl completes, you can manually start an email crawl:
+Check progress and export results:
 
 ```bash
-# First, start a map crawl
-curl -X POST http://localhost:8000/crawl \
+curl http://localhost:6970/status
+curl "http://localhost:6970/results?format=csv" -o leads.csv
+```
+
+The first build downloads Playwright and Chromium, so it can take a few minutes.
+The default ports can be changed in `.env`. See the
+[quick start guide](docs/quickstart.md) for local development and more commands.
+
+## Screenshots
+
+<p align="center">
+  <a href="docs/assets/screenshots/dashboard.png"><img src="docs/assets/screenshots/dashboard.png" alt="Sherlock Maps dashboard with live crawler KPIs" width="49%"></a>
+  <a href="docs/assets/screenshots/results.png"><img src="docs/assets/screenshots/results.png" alt="Company results with emails and ratings" width="49%"></a>
+</p>
+<p align="center"><em>Dashboard and enriched company results.</em></p>
+
+<p align="center">
+  <a href="docs/assets/screenshots/email-campaign.png"><img src="docs/assets/screenshots/email-campaign.png" alt="Email campaign composer with recipients" width="49%"></a>
+  <a href="docs/assets/screenshots/settings.png"><img src="docs/assets/screenshots/settings.png" alt="SMTP settings and email templates" width="49%"></a>
+</p>
+<p align="center"><em>Campaign composer and SMTP/template settings.</em></p>
+
+> Screenshots use fictional demo data. No real leads, email addresses or SMTP
+> credentials are shown.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Google Maps] --> B[Playwright crawler]
+    B --> C[Company extractor]
+    C --> D[Deduplication + URL validation]
+    D --> E[Company results]
+    E --> F[Email enrichment]
+    E --> G[CSV / JSON export]
+    F --> H[REST API + job store]
+    H --> I[Next.js dashboard]
+    F --> J[Email campaigns]
+```
+
+1. **Search** — navigate to Google Maps with your search term.
+2. **Scroll and extract** — load result cards and open each detail page.
+3. **Clean** — deduplicate companies and validate websites.
+4. **Enrich** — optionally crawl company websites for email addresses.
+5. **Deliver** — inspect in the dashboard, use the API or export CSV/JSON.
+
+More detail: [Architecture](docs/architecture.md).
+
+## Use cases
+
+- **Lead generation** — build targeted local-business lists for agencies and sales teams.
+- **Local SEO** — audit categories, ratings, reviews and websites across a market.
+- **Market research** — compare competitors, categories and opening hours by city.
+- **CRM enrichment** — add websites and contact emails to an existing lead database.
+
+## REST API & Python
+
+The API is documented interactively at `/docs`. A typical flow:
+
+```bash
+API=http://localhost:6970
+
+# Start a crawl
+curl -X POST "$API/crawl" \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "restaurants berlin"}'
+  -d '{"prompt": "cafes berlin", "auto_email_crawl": true}'
 
-# Response: {"job_id": "abc-123", ...}
+# Poll the job
+curl "$API/crawl/JOB_ID"
 
-# Then start an email crawl for that job
-curl -X POST http://localhost:8000/email-crawl \
-  -H "Content-Type: application/json" \
-  -d '{"job_id": "abc-123"}'
-
-# Response: {"job_id": "email-456", "parent_job_id": "abc-123", ...}
-
-# Check email crawl status
-curl http://localhost:8000/email-crawl/email-456
-
-# Get all emails
-curl http://localhost:8000/emails
-
-# Get all emails with pagination
-curl "http://localhost:8000/emails?limit=10&offset=0"
-
-# Clear all emails
-curl -X DELETE http://localhost:8000/emails
+# Get results
+curl "$API/crawl/JOB_ID/results"
 ```
 
-**Email Response Example:**
+Use the crawler as a Python library:
 
-```json
-{
-  "job_id": "email-456",
-  "parent_job_id": "abc-123",
-  "status": "completed",
-  "total_emails": 15,
-  "emails": [
-    {
-      "email": "info@restaurant-example.de",
-      "source_url": "https://www.restaurant-example.de/kontakt",
-      "company_name": "Restaurant Example",
-      "job_id": "abc-123",
-      "domain": "restaurant-example.de",
-      "additional_urls_crawled": 3,
-      "found_at": "2026-01-15T10:35:00Z"
-    }
-  ],
-  "created_at": "2026-01-15T10:33:00Z",
-  "completed_at": "2026-01-15T10:35:30Z",
-  "error": null
-}
+```python
+from core.crawler import run_crawler
+
+results = run_crawler(
+    prompt="restaurants berlin",
+    headless=False,
+    output_format="json",
+)
+
+for company in results:
+    print(company.name, company.website)
 ```
 
-**How Email Crawling Works:**
-
-1. The email crawler visits each company website from the map crawl results
-2. It extracts email addresses from the HTML content using regex patterns
-3. It follows internal links (Kontakt, Impressum, About, etc.) to find more emails
-4. Emails are deduplicated (same email only stored once)
-5. Each email includes metadata about where it was found
-
----
-
-## How It Works
-
-1. **Search** - Navigates to Google Maps with the search term
-2. **Scroll** - Loads all search results by scrolling
-3. **Extract** - Navigates to each result's detail page and extracts:
-   - Company name, category, address, phone, website
-   - Rating and number of reviews
-   - Opening hours
-   - Attributes
-4. **Filter** - Removes duplicates and validates website URLs
-5. **Output** - Outputs results in the desired format
-
----
-
-## Architecture
-
-```
-Sherlock Maps/
-├── .gitignore
-├── docker-compose.yml
-├── README.md
-├── public/
-│   └── SherlockMaps.png
-└── core/
-    ├── __init__.py                   # Package exports
-    ├── main.py                       # CLI entry point
-    ├── main_cli.py                   # CLI logic
-    ├── crawler.py                    # Main crawler class
-    ├── requirements.txt              # Python dependencies
-    ├── api/
-    │   ├── __init__.py
-    │   ├── models.py                 # API data models
-    │   ├── queue_manager.py          # Job queue management
-    │   └── server.py                 # FastAPI server
-    ├── browser/
-    │   ├── __init__.py
-    │   └── browser_manager.py        # Browser lifecycle management
-    ├── exceptions/
-    │   ├── __init__.py
-    │   └── crawler_exceptions.py     # Custom exceptions
-    ├── extractors/
-    │   ├── __init__.py
-    │   ├── maps_extractor.py         # Google Maps data extraction
-    │   └── email_extractor.py        # Email extraction from websites
-    ├── models/
-    │   ├── __init__.py
-    │   ├── company.py                # CompanyData model
-    │   ├── crawler_config.py         # CrawlerConfig model
-    │   └── email_data.py             # EmailData model
-    ├── output/
-    │   ├── __init__.py
-    │   └── output_handler.py         # Output formats
-    └── processors/
-        ├── __init__.py
-        ├── url_validator.py          # URL validation
-        └── deduplication_processor.py # Deduplication
-```
-
-### Class Overview
-
-| Class | Module | Description |
-|---|---|---|
-| `Sherlock Maps` | | Open-Source Google Maps Webcrawler |
-| `GoogleMapsCrawler` | `crawler.py` | Main class, orchestrates the entire crawling process |
-| `BrowserManager` | `browser/browser_manager.py` | Manages Playwright browser lifecycle |
-| `MapsExtractor` | `extractors/maps_extractor.py` | Extracts company data from Google Maps |
-| `EmailExtractor` | `extractors/email_extractor.py` | Extracts emails from company websites |
-| `CompanyData` | `models/company.py` | Data model for a company |
-| `EmailData` | `models/email_data.py` | Data model for an email |
-| `CrawlerConfig` | `models/crawler_config.py` | Crawler configuration |
-| `URLValidator` | `processors/url_validator.py` | Validates HTTP(S) URLs |
-| `DeduplicationProcessor` | `processors/deduplication_processor.py` | Removes duplicates |
-| `OutputHandler` | `output/output_handler.py` | Formats and outputs results |
-| `CrawlerBaseException` | `exceptions/crawler_exceptions.py` | Base exception class |
-
----
+Full endpoint reference: [REST API](docs/api.md).
 
 ## Configuration
 
-### CrawlerConfig Attributes
+| Variable | Default | Description |
+|---|---|---|
+| `API_PORT` | `6970` | Docker host port for the API |
+| `UI_PORT` | `3008` | Docker host port for the dashboard |
+| `OUTPUT_FORMAT` | `json` | `json`, `csv`, `pretty`, `file`, `print` |
+| `HEADLESS` | `false` | Run Chromium without a window |
+| `TRACK_REVIEWS` | `true` | Extract review data |
+| `CHROME_PROFILE_PATH` | `core/Chrome_Profile` | Optional local Chrome profile |
 
-| Attribute | Type | Default | Description |
-|---|---|---|---|
-| `search_prompt` | `str` | `""` | The search term for Google Maps |
-| `headless` | `bool` | `False` | Run browser in headless mode |
-| `output_format` | `Literal` | `"json"` | Output format |
-| `chrome_profile_path` | `str` | `"Chrome_Profile"` | Path to Chrome user data directory |
-| `viewport` | `ViewPort` | `1920x1080` | Browser viewport dimensions |
-| `locale` | `str` | `"de-DE"` | Browser localization |
-| `page_timeout` | `int` | `30000` | Maximum navigation timeout in ms |
-| `selector_timeout` | `int` | `15000` | Maximum timeout for selectors in ms |
-| `scroll_timeout` | `int` | `45` | Maximum time for scrolling in seconds |
-| `max_scroll_attempts` | `int` | `5` | Number of scroll attempts before stop |
-| `max_retries` | `int` | `3` | Number of navigation retry attempts |
-| `request_timeout` | `int` | `25000` | Request timeout in ms |
+See [Configuration](docs/configuration.md) for the complete list.
 
----
+## Chrome profile & extensions
 
-## Example Output
+Your personal Chrome profile — cookies, logins and extensions — stays local and
+is never committed. The crawler uses `core/Chrome_Profile` by default and also
+supports `CHROME_PROFILE_PATH` and `use_persistent_profile` for API crawls.
 
-```json
-[
-  {
-    "name": "Restaurant Name",
-    "category": "Restaurant",
-    "address": "Musterstrasse 1, 10115 Berlin",
-    "phone": "+49 30 12345678",
-    "website": "https://www.restaurant-example.de",
-    "rating": "4.5",
-    "reviews_count": "234",
-    "plus_code": "GVMF+8H Berlin",
-    "opening_hours": "Mon: 12:00-22:00, Tue: 12:00-22:00, ...",
-    "attributes": ["Wheelchair accessible entrance"]
-  }
-]
-```
+The repository bundles **I still don't care about cookies** in
+`core/extensions/`, so every user gets the same cookie-banner handling without
+sharing a profile. Add your own unpacked extensions to `core/extensions/`.
 
----
+- [Browser profile guide](docs/browser-profile.md)
+- [Extension guide](docs/extensions.md)
 
-## Limitations
+## Deployment
 
-- Google Maps UI changes may break selectors (CSS classes like `h1.DUwDvf` are Google-specific)
-- Rate limiting: Google may show CAPTCHAs for fast requests
-- German localization is hardcoded (`hl=de`), for other languages `browser_manager.py` must be modified
-- Requires a display or headless mode for Chromium
+- **Docker Compose** — [quick start](docs/quickstart.md#docker-compose-recommended)
+- **Local backend + UI** — [quick start](docs/quickstart.md#local-development)
+- **Reverse proxy / ports** — [configuration](docs/configuration.md)
+- **Troubleshooting** — [troubleshooting](docs/troubleshooting.md)
 
----
+The API has no authentication by default. Keep it on localhost or a trusted
+network, or put it behind an authenticated reverse proxy.
 
-## Resources
+## Roadmap
 
-- [Playwright Documentation](https://playwright.dev)
-- [Contribution Guide](CONTRIBUTING.md)
-- [MIT License](LICENSE)
+- [x] Google Maps company extraction
+- [x] Email enrichment
+- [x] REST API + Next.js dashboard
+- [x] Docker Compose deployment
+- [ ] Static demo with sample data
+- [ ] n8n / Google Sheets / CRM integrations
+- [ ] Additional locales
+- [ ] PyPI package
 
----
+Have an idea or found a bug? [Open an issue](https://github.com/Ayyouboss0011/SherlockMaps/issues).
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup,
+branch naming, screenshot updates and the PR checklist.
+
+Good first issues are labeled [`good first issue`](https://github.com/Ayyouboss0011/SherlockMaps/labels/good%20first%20issue).
 
 ## License
 
-MIT License
+Sherlock Maps is released under the [MIT License](LICENSE).
+
+The bundled cookie-consent extension is GPL-3.0. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Responsible use
+
+Sherlock Maps is intended for research and internal business use. Scraping
+Google Maps may be subject to Google's Terms of Service and local law. Respect
+rate limits, privacy rights and anti-spam rules. The email blacklist exists to
+help you honor opt-outs.
+
+---
+
+<div align="center">
+  <p><strong>If Sherlock Maps saves you time, a ⭐ helps other developers find it.</strong></p>
+</div>
