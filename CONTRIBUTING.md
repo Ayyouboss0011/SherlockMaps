@@ -140,8 +140,9 @@ Useful contributions include:
 - UI tests for the results table and campaign form.
 
 Place Python tests in `tests/` and keep them independent of a real browser or
-Google Maps whenever possible. CI also runs `python -m compileall -q core`,
-`ruff check core --select E9,F63,F7,F82` and the UI production build.
+Google Maps whenever possible. Before opening a PR, also run
+`python -m compileall -q core`, `ruff check core --select E9,F63,F7,F82` and the
+UI production build.
 
 ## Reporting bugs
 

@@ -19,7 +19,7 @@ All notable changes to this project are documented here. The format follows
 - Optional persistent Chrome profile via `CHROME_PROFILE_PATH` and
   `use_persistent_profile`.
 - Repository documentation, screenshots, demo fixtures and screenshot tooling.
-- GitHub issue/PR templates, CI workflow and third-party notices.
+- GitHub issue/PR templates and third-party notices.
 
 ### Changed
 

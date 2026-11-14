@@ -5,7 +5,6 @@
   <p>
     <a href="https://github.com/Ayyouboss0011/SherlockMaps/stargazers"><img src="https://img.shields.io/github/stars/Ayyouboss0011/SherlockMaps?style=social" alt="GitHub stars"></a>
     <a href="https://github.com/Ayyouboss0011/SherlockMaps/releases"><img src="https://img.shields.io/github/v/release/Ayyouboss0011/SherlockMaps?display_name=release&sort=semver" alt="Latest release"></a>
-    <a href="https://github.com/Ayyouboss0011/SherlockMaps/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Ayyouboss0011/SherlockMaps/ci.yml?branch=main&label=CI" alt="CI status"></a>
     <img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python 3.9+">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
     <a href="https://docs.docker.com/compose/"><img src="https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white" alt="Docker Compose"></a>

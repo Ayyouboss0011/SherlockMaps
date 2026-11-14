@@ -104,4 +104,4 @@ SMTP server.
 - [ ] Screenshots show no real personal data
 - [ ] No Chrome profile, `.env`, cookies or logs are tracked
 - [ ] `CONTRIBUTING.md`, `SECURITY.md` and `LICENSE` are linked
-- [ ] CI is green
+- [ ] Tests and the UI build pass locally
