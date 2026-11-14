@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Komunitná verzia rozšírenia `I don't care about cookies` (nepatrí Avastu)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "I still don't care about cookies"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Späť"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Vyskytla sa chyba"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Skúste to znova neskôr.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Zakázať rozšírenie na $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Povoliť rozšírenie na $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "Rozšírenie na tejto stránke nefunguje"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Načítava sa..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Nahlásiť varovanie pred cookies"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Podporte tento projekt"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "indikátory stavu"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Uložiť nastavenia"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Nastavenia"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Zoznam všetkých povolených stránok, jedna stránka na riadku:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Nahlásiť anonymne"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Zrušiť"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Poznámky: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Odoslať hlásenie"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Nahlásiť"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Želáte si vytvoriť hlásenie o varovaní pred cookies na $HOSTNAME$?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Nahlásiť na GitHube"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Things like:\nVideoplayback not working\nBroken scrollbar\ngray overlay"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Na tejto stránke ste rozšírenie zakázali. Prosím, povoľte ho a skontrolujte, či vidíte varovanie pred cookies pred tým, ako vytvoríte hlásenie."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Rozšírenie je na $HOSTNAME$ vypnuté.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

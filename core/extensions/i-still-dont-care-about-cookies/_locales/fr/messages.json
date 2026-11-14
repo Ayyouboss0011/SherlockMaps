@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Version communautaire de l'extension \"Je m'en fiche des cookies\" (sans Avast)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "I still don't care about cookies"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Retour"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Un problème est survenu"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Réessayez plus tard.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Désactiver l'extension sur $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Activer l'extension sur $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "L'extension ne fonctionne pas sur ce site"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Chargement..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Signaler un avertissement de cookie"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Faire un don pour supporter ce projet"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "indicateur de statut"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Enregistrer"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Paramètres"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Liste de tous les sites sur liste blanche, un site par ligne:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Signaler anonymement"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Annuler"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Notes : "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Envoyer le rapport"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Signaler"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Voulez vous signaler un avertissement de cookies on $HOSTNAME$?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Signaler via Github"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Des actions comme :\nVidéo en arrière-plan qui ne fonctionne pas\nBarre de défilement non fonctionnelle\nUne superposition grise"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Vous avez désactivé l'extension sur ce site. Merci de l'activer et de vérifier si vous voyez toujours l'avertissement de cookies avant de signaler."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "L'extension est désactivée sur $HOSTNAME$.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

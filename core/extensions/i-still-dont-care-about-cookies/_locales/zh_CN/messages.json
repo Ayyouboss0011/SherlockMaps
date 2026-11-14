@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Community version of the extension `I don't care about cookies` (no Avast)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "I still don't care about cookies"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Back"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Something went wrong"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Try again later.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "在$HOSTNAME$上禁用扩展",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "在$HOSTNAME$上启用扩展",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "扩展程序不适用于此网站"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Loading..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "报告cookie警告"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "支持该项目"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "status indicators"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "保存设置"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "设置"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "白名单网站列表，每行一个网站："
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Report anonymously"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Cancel"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Notes: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Send report"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Report"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "您想报告$HOSTNAME$上的cookie警告吗？",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Report using Github"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Things like:\nVideoplayback not working\nBroken scrollbar\ngray overlay"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "您已禁用此网站上的扩展程序。请启用它并检查您是否在报告前看到cookie警告。"
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "插件在$HOSTNAME$上不可用",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

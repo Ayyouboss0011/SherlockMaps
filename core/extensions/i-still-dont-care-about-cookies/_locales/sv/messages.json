@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Community version of the extension `I don't care about cookies` (no Avast)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "I still don't care about cookies"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Back"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Something went wrong"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Try again later.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Inaktivera tillägget på $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Aktivera tillägget på $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "Utökningen fungerar inte på den här webbplatsen"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Loading..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Rapportera en webbkak-varning"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Stötta det här projektet"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "status indicators"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Spara inställningar"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Inställningar"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Alla vitlistade webbplatser, en webbplats per rad:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Report anonymously"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Cancel"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Notes: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Send report"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Report"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Vill du skicka in en webbkak-varning på $HOSTNAME$?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Report using Github"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Things like:\nVideoplayback not working\nBroken scrollbar\ngray overlay"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Du har stängt av tillägget på den här webbplatsen. Var vänlig och aktivera den och titta om du ser varningen innan du rapporterar."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Utökningen är avstängd på $HOSTNAME$.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

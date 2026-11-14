@@ -156,6 +156,7 @@ def run_crawl_in_process(
     headless: bool = False,
     locale: str = "de-DE",
     track_reviews: bool = True,
+    use_persistent_profile: bool = False,
 ) -> list[dict[str, Any]]:
     """Run a crawl in a worker process.
 
@@ -168,23 +169,31 @@ def run_crawl_in_process(
         headless: Run in headless mode.
         locale: Browser locale.
         track_reviews: Whether to extract reviews for each company.
+        use_persistent_profile: Reuse CHROME_PROFILE_PATH instead of a temporary
+            profile. Use this when cookies/logins or profile-specific extensions
+            are required. Crawls should be serialized in that mode.
 
     Returns:
         List of company dictionaries.
     """
     import tempfile
 
-    # Create a unique temporary profile directory for this crawl
-    # This avoids ProcessSingleton conflicts when running multiple crawls
-    temp_profile_dir = tempfile.mkdtemp(prefix="chrome_profile_")
+    # A unique temporary profile avoids ProcessSingleton conflicts. Opting into
+    # the persistent profile keeps cookies/logins and profile extensions.
+    temp_profile_dir = None
+    if use_persistent_profile:
+        profile_path = ""  # CrawlerConfig resolves CHROME_PROFILE_PATH/default.
+    else:
+        temp_profile_dir = tempfile.mkdtemp(prefix="chrome_profile_")
+        profile_path = temp_profile_dir
 
-    # Import and initialize browser in this process with unique profile
+    # Import and initialize browser in this process with the chosen profile
     config = CrawlerConfig(
         search_prompt=prompt,
         headless=headless,
         output_format=output_format,
         locale=locale,
-        chrome_profile_path=temp_profile_dir,
+        chrome_profile_path=profile_path,
     )
 
     browser_mgr = BrowserManager(config)
@@ -221,12 +230,13 @@ def run_crawl_in_process(
 
     finally:
         browser_mgr.close()
-        # Clean up temporary profile directory
-        import shutil
-        try:
-            shutil.rmtree(temp_profile_dir, ignore_errors=True)
-        except Exception:
-            pass
+        # Clean up only profiles created for this job.
+        if temp_profile_dir:
+            import shutil
+            try:
+                shutil.rmtree(temp_profile_dir, ignore_errors=True)
+            except Exception:
+                pass
 
 
 def _collect_recipients_from_job(job) -> list[dict[str, Any]]:
@@ -356,6 +366,7 @@ def _create_app() -> FastAPI:
             max_results=request.max_results,
             track_reviews=request.track_reviews,
             auto_email_crawl=request.auto_email_crawl,
+            use_persistent_profile=request.use_persistent_profile,
         )
 
         # Start background processing
@@ -1202,6 +1213,7 @@ async def _process_job(job_id: str) -> None:
             job.headless,
             job.locale,
             job.track_reviews,
+            job.use_persistent_profile,
         )
 
         await queue_manager.complete_job(job_id, results)

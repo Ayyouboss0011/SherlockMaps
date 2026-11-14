@@ -30,7 +30,8 @@ class CrawlJob:
 
     def __init__(self, prompt: str, output_format: str = "json", headless: bool = False,
                  locale: str = "de-DE", max_results: Optional[int] = None,
-                 track_reviews: bool = True, auto_email_crawl: bool = False) -> None:
+                 track_reviews: bool = True, auto_email_crawl: bool = False,
+                 use_persistent_profile: bool = False) -> None:
         self.job_id: str = str(uuid.uuid4())
         self.prompt: str = prompt
         self.output_format: str = output_format
@@ -39,6 +40,7 @@ class CrawlJob:
         self.max_results: Optional[int] = max_results
         self.track_reviews: bool = track_reviews
         self.auto_email_crawl: bool = auto_email_crawl
+        self.use_persistent_profile: bool = use_persistent_profile
         self.status: JobStatus = JobStatus.PENDING
         self.created_at: datetime = datetime.now(timezone.utc)
         self.completed_at: Optional[datetime] = None
@@ -79,6 +81,7 @@ class CrawlJob:
             "max_results": self.max_results,
             "track_reviews": self.track_reviews,
             "auto_email_crawl": self.auto_email_crawl,
+            "use_persistent_profile": self.use_persistent_profile,
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
@@ -138,6 +141,7 @@ def _serialize_crawl_job(job: CrawlJob) -> dict[str, Any]:
         "max_results": job.max_results,
         "track_reviews": job.track_reviews,
         "auto_email_crawl": job.auto_email_crawl,
+        "use_persistent_profile": job.use_persistent_profile,
         "status": job.status.value,
         "created_at": job.created_at.isoformat(),
         "completed_at": job.completed_at.isoformat() if job.completed_at else None,
@@ -235,6 +239,7 @@ class QueueManager:
             max_results=raw.get("max_results"),
             track_reviews=raw.get("track_reviews", True),
             auto_email_crawl=raw.get("auto_email_crawl", False),
+            use_persistent_profile=raw.get("use_persistent_profile", False),
         )
         job.job_id = raw.get("job_id") or job.job_id
         try:
@@ -350,7 +355,8 @@ class QueueManager:
 
     async def add_job(self, prompt: str, output_format: str = "json", headless: bool = False,
                       locale: str = "de-DE", max_results: Optional[int] = None,
-                      track_reviews: bool = True, auto_email_crawl: bool = False) -> CrawlJob:
+                      track_reviews: bool = True, auto_email_crawl: bool = False,
+                      use_persistent_profile: bool = False) -> CrawlJob:
         """Add a new crawl job to the queue."""
         async with self._lock:
             job = CrawlJob(
@@ -361,6 +367,7 @@ class QueueManager:
                 max_results=max_results,
                 track_reviews=track_reviews,
                 auto_email_crawl=auto_email_crawl,
+                use_persistent_profile=use_persistent_profile,
             )
             self._crawl_jobs[job.job_id] = job
             self._crawl_queue.append(job.job_id)

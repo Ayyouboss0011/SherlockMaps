@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Общностна версия на добавката „Все още не ме е грижа за бисквитките“ (без Avast)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Все още не ме е грижа за бисквитките"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Назад"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Нещо се обърка"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Опитай пак по-късно.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Изключване на добавката за $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Включване на добавката за $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "Добавката не работи за този сайт"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Зареждане..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Докладвайте предупреждение за бисквитки"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Подкрепете този проект"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "показатели на състоянието"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Запазване на настройките"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Настройки"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Списък на всички сайтове, на които е разрешено да показват предупреждения за бисквитки. По един сайт на ред:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Безименно докладване"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Отказ"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Бележки: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Изпращане на доклад"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Докладване"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Желаете ли да докладвате предупреждение за бисквитки в $HOSTNAME$?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Докладване посредством Github"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Неща като:\nВидеото не се възпроизвежда\nЧупен плъзгач\nСива област на екрана"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Вие сте изключили добавката за този сайт. Моля, включете я и проверете дали виждате предупреждението за бисквитки преди да го докладвате."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Добавката е изключена за $HOSTNAME$.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

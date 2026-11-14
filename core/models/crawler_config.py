@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -40,6 +41,7 @@ class CrawlerConfig:
         headless: Whether to run the browser in headless mode.
         output_format: The output format - one of "json", "csv", "pretty", "file", "print".
         chrome_profile_path: Path to the Chrome user data directory.
+        extensions_path: Directory containing unpacked Chromium extensions.
         viewport: The browser viewport dimensions.
         locale: The browser locale (e.g., "de-DE").
         page_timeout: Maximum navigation timeout in milliseconds.
@@ -55,6 +57,7 @@ class CrawlerConfig:
     headless: bool = False
     output_format: Literal["json", "csv", "pretty", "file", "print"] = "json"
     chrome_profile_path: str = field(default="")
+    extensions_path: str = field(default="")
     viewport: ViewPort = field(default_factory=lambda: ViewPort())
     locale: str = "de-DE"
     page_timeout: int = 30000
@@ -67,14 +70,43 @@ class CrawlerConfig:
 
     def __post_init__(self) -> None:
         """Resolve relative paths to absolute paths after initialization."""
+        # The package lives in <repo>/core, so parent.parent is the core folder.
+        script_dir = Path(__file__).resolve().parent.parent
+
         if not self.chrome_profile_path:
-            # Default profile path relative to this file's directory
-            script_dir = Path(__file__).resolve().parent.parent
+            # Allow deployments (Docker, CI, custom installs) to point at a
+            # profile outside the repository without changing code.
+            env_profile = os.getenv("CHROME_PROFILE_PATH", "").strip()
             object.__setattr__(
                 self,
                 "chrome_profile_path",
-                str(script_dir / "Chrome_Profile"),
+                env_profile or str(script_dir / "Chrome_Profile"),
             )
+
+        if not self.extensions_path:
+            object.__setattr__(
+                self,
+                "extensions_path",
+                str(script_dir / "extensions"),
+            )
+
+    def get_extension_paths(self) -> list[str]:
+        """Return unpacked Chromium extensions that should be loaded.
+
+        Every direct child directory of ``extensions_path`` that contains a
+        ``manifest.json`` is treated as an unpacked extension. This keeps the
+        bundled cookie-consent extension reproducible without committing a
+        complete Chrome profile.
+        """
+        base = Path(self.extensions_path)
+        if not base.is_dir():
+            return []
+
+        return [
+            str(child)
+            for child in sorted(base.iterdir())
+            if child.is_dir() and (child / "manifest.json").is_file()
+        ]
 
     def with_prompt(self, prompt: str) -> "CrawlerConfig":
         """Return a new config with the updated search prompt.
@@ -97,15 +129,28 @@ class CrawlerConfig:
         Returns:
             A dictionary of browser launch arguments.
         """
+        browser_args = [
+            "--autoplay-policy=no-user-gesture-required",
+            "--disable-dev-shm-usage",
+            "--no-sandbox",
+            "--disable-blink-features=AutomationControlled",
+        ]
+
+        extension_paths = self.get_extension_paths()
+        if extension_paths:
+            # Chromium expects a comma-separated list for both flags.
+            extensions = ",".join(extension_paths)
+            browser_args.extend(
+                [
+                    f"--disable-extensions-except={extensions}",
+                    f"--load-extension={extensions}",
+                ]
+            )
+
         return {
             "user_data_dir": self.chrome_profile_path,
             "headless": self.headless,
-            "args": [
-                "--autoplay-policy=no-user-gesture-required",
-                "--disable-dev-shm-usage",
-                "--no-sandbox",
-                "--disable-blink-features=AutomationControlled",
-            ],
+            "args": browser_args,
             "locale": self.locale,
             "viewport": self.viewport.to_dict(),
         }

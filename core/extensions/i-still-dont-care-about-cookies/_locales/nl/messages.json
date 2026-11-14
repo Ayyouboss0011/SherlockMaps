@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Community versie van de extensie `Cookies kunnen mij nog steeds niets schelen` (geen Avast)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Cookies kunnen mij nog steeds niets schelen"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Terug"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Er is iets mis gegaan"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Probeer het later opnieuw.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Extensie uitschakelen op $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Extensie inschakelen op $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "Extensie werkt niet op deze website"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Laden..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Een cookiewaarschuwing rapporteren"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Dit project steunen"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "status indicatoren"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Instellingen opslaan"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Instellingen"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Lijst van alle ‘whitelisted’ websites, één website per regel:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Meld anoniem"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Annuleren"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Notities: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Melding versturen"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Melden"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Wilt u een cookiewaarschuwing op $HOSTNAME$ rapporteren?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Meld met GitHub"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Dingen zoals:\nVideo afspelen werkt niet\nKapotte scrollbalk\ngrijze overlay"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "U hebt de extensie op deze website uitgeschakeld. Schakel hem weer in en controleer of u de waarschuwing ziet voordat u deze rapporteert."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Extensie is uitgeschakeld op $HOSTNAME$.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

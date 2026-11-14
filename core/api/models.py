@@ -36,6 +36,13 @@ class CrawlRequest(BaseModel):
     max_results: Optional[int] = Field(default=None, ge=1, description="Maximum number of results")
     track_reviews: bool = Field(default=True, description="Whether to track and extract reviews for each company")
     auto_email_crawl: bool = Field(default=False, description="Automatically start email crawl after successful map crawl")
+    use_persistent_profile: bool = Field(
+        default=False,
+        description=(
+            "Use the persistent Chrome profile at CHROME_PROFILE_PATH instead of a "
+            "temporary profile. Requires serialized crawls and a headed browser for extensions."
+        ),
+    )
 
 
 class CrawlResponse(BaseModel):

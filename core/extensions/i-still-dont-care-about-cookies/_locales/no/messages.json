@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "En versjon av utvidelsen `Jeg bryr meg ikke om informasjonskapsler` (uten Avast) som er laget av felleskapet"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Jeg bryr meg fortsatt ikke om informasjonskapsler"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Tilbake"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "Noe gikk galt"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Prøv igjen senere.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Skru av utvidelsen på $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Skru på utvidelsen på $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "Utvidelsen virker ikke på dette nettstedet"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Laster..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Meld ifra om en infokapseladvarsel"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Støtt dette prosjektet"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "statusindikatorer"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Lagre innstillinger"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Innstillinger"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Liste over alle hvitelistede nettsteder, ett nettsted per linje:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Rapporter anonymt"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Avbryt"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Notater: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Send rapport"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Rapporter"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Vil du melde ifra om en infokapseladvarsel på $HOSTNAME$?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Rapporter med Github"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Ting som:\nVideoavspilling som ikke fungerer\nDefekt rullefelt\ngrått overlegg"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Du har skrudd av utvidelsen på dette nettstedet. Vennligst skru den på og se om du fortsatt ser infokapseladvarselen, før du melder ifra om den."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Utvidelsen er avskrudd på $HOSTNAME$.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

@@ -1,0 +1,38 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "icons/16.png",
+         "32": "icons/32.png"
+      },
+      "default_popup": "data/menu/index.html"
+   },
+   "author": "OhMyGuus and Community (originally Daniel Kladnik)",
+   "background": {
+      "service_worker": "data/background.js",
+      "type": "module"
+   },
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "enabled": true,
+         "id": "ruleset_1",
+         "path": "rules.json"
+      } ]
+   },
+   "default_locale": "en",
+   "description": "__MSG_extensionDescription__",
+   "host_permissions": [ "http://*/*", "https://*/*" ],
+   "icons": {
+      "128": "icons/128.png",
+      "16": "icons/16.png",
+      "48": "icons/48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqripwk4IcwQ3gnV6tGSbsk2sA8FoCrjN5l4nSjr3Z+77QIVUScMopQ+8kS5QsMHgki+g+jwECROri93mj3oy6oJTtypkd+FtIY+EVEnE85pVdfPzYVcNOu7mMl62VxWfdVFFcRmxvPf5orefKWPY9ztx7qIBioxvcZAXML7c3YGaBI7XGfLdsTVJgLEt07Z0t8mDHmsMcA7pKRMYjJFnQkp9gOWl9QcY3H6TGBSeN3BhwT04iumScKkOa8biWihZIo8dL2h6YBqfRf+gUMBeLyglrANhRJ+x3w+FB3wimu/4iHmAI1xrtU0fWM3AHXZtgX5KBjvAOmImyXTIdypCCQIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_extensionName__",
+   "options_ui": {
+      "page": "data/options.html"
+   },
+   "permissions": [ "tabs", "storage", "notifications", "webRequest", "declarativeNetRequestWithHostAccess", "webNavigation", "scripting" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.1.4"
+}

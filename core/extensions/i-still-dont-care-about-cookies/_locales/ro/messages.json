@@ -1,0 +1,146 @@
+{
+   "extensionDescription": {
+      "description": "Description of the extension.",
+      "message": "Versiunea comunitară a extensiei \"Nu îmi pasă de cookie-uri\" (fără Avast)"
+   },
+   "extensionName": {
+      "description": "Name of the extension.",
+      "message": "Încă nu îmi pasă de cookie-uri"
+   },
+   "generalIssueOption": {
+      "description": "The option text for a general issue",
+      "message": "General issue (requires notes)"
+   },
+   "genericErrorBack": {
+      "description": "Back button after error",
+      "message": "Înapoi"
+   },
+   "genericErrorTitle": {
+      "description": "Genereric error title",
+      "message": "A avut loc o eroare"
+   },
+   "genericErrorTryAgain": {
+      "description": "Try again later message",
+      "message": "Încercați mai târziu.."
+   },
+   "menuDisable": {
+      "description": "Menu option.",
+      "message": "Dezactivează extensie pe $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuEnable": {
+      "description": "Menu option.",
+      "message": "Permite extensie pe $HOSTNAME$",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "menuIdle": {
+      "description": "Menu option visible when enabling/disabling doesn't work.",
+      "message": "Extensia nu funcționează pe acest website"
+   },
+   "menuLoadingText": {
+      "description": "Loading messsage",
+      "message": "Încărcare..."
+   },
+   "menuReport": {
+      "description": "Menu option.",
+      "message": "Raportează un avertisment cookie"
+   },
+   "menuSupport": {
+      "description": "Menu option.",
+      "message": "Susține acest proiect"
+   },
+   "modalIssueDescription": {
+      "description": "Explanation of what a modal issue is",
+      "message": "Select this option to signify an issue on this page related to a modal - like 'there is a pop-up box blocking interaction'."
+   },
+   "modalIssueOption": {
+      "description": "The option text for a modal issue",
+      "message": "Modal related"
+   },
+   "optionStatusIndicators": {
+      "description": "Option text for enabling the status indicator",
+      "message": "indicatori de stare"
+   },
+   "optionsButton": {
+      "description": "Options text for SAVE button.",
+      "message": "Salvează setările"
+   },
+   "optionsTitle": {
+      "description": "Title for the options page.",
+      "message": "Setări"
+   },
+   "optionsWhitelist": {
+      "description": "Options text for whitelist box.",
+      "message": "Lista albă (whitelist) a tuturor website-urilor, câte un website pe fiecare rând:"
+   },
+   "reportAnon": {
+      "description": "Menu item to report anonymously",
+      "message": "Raportează anonim"
+   },
+   "reportAnonCancel": {
+      "description": "Button to cCancel the report",
+      "message": "Anulare"
+   },
+   "reportAnonNotes": {
+      "description": "Notes for the report",
+      "message": "Observații: "
+   },
+   "reportAnonSend": {
+      "description": "Button to send the report",
+      "message": "Trimite raportul"
+   },
+   "reportAnonTitle": {
+      "description": "Translation of 'report' it will be shown like 'Report example.com'",
+      "message": "Raportează"
+   },
+   "reportConfirm": {
+      "description": "Ask for confirmation before reporting a website. Don't use quotes here.",
+      "message": "Doriți să raportați un avertisment cookie pe $HOSTNAME$?",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "reportGithub": {
+      "description": "Menu item to report using Github",
+      "message": "Reportează problema pe Github"
+   },
+   "reportNotesPlaceholder": {
+      "description": "Placeholder for the notes (\n) is a new line & keep it 4 lines",
+      "message": "Lucruri precum:\nVideoplayback nu funcţionează\nscrollbar stricat\nsuprapunere gri"
+   },
+   "reportSkippedMessage": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Ați dezactivat extensia pe acest website. Vă rugăm activați-o și verificați dacă vedeți avertismentul cookie înainte de a-l raporta."
+   },
+   "reportSkippedTitle": {
+      "description": "Tells the user it cannot report a whitelisted domain.",
+      "message": "Extensia este dezactivată pe $HOSTNAME$.",
+      "placeholders": {
+         "hostname": {
+            "content": "$1",
+            "example": "example.com"
+         }
+      }
+   },
+   "scrollbarIssueDescription": {
+      "description": "Explanation of what a scrollbar issue is",
+      "message": "Select this option to signify an issue on this page related to scrolling - like 'the site is not showing a scrollbar'."
+   },
+   "scrollbarIssueOption": {
+      "description": "The option text for a scrollbar issue",
+      "message": "Scrollbar related"
+   }
+}

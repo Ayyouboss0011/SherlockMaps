@@ -48,6 +48,8 @@ docker-compose.yml
 
 # Documentation
 *.md
+# Keep extension licenses/readmes inside the image for GPL compliance
+!extensions/**/*.md
 
 # OS
 .DS_Store

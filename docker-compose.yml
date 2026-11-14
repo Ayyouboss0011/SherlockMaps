@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   crawler:
     build:
@@ -13,6 +11,7 @@ services:
       - API_PORT=8000
       - DISPLAY=:99
       - PYTHONUNBUFFERED=1
+      - CHROME_PROFILE_PATH=/app/core/Chrome_Profile
     volumes:
       # Persist Chrome profile between runs
       - chrome_profile:/app/core/Chrome_Profile
@@ -25,6 +24,12 @@ services:
       # Persist Xvfb logs for debugging
       - xvfb_logs:/var/log/xvfb
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     # Resource limits
     deploy:
       resources:
@@ -49,8 +54,15 @@ services:
       # Server-side (SSR) API URL, reachable inside the Docker network
       - CRAWLER_API_URL=http://crawler:8000
     depends_on:
-      - crawler
+      crawler:
+        condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
     # Resource limits
     deploy:
       resources:
